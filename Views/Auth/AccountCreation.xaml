@@ -1,0 +1,199 @@
+﻿<Window x:Class="MoreConnector.AccountCreation"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Account creation · Primary" Height="720" Width="1060"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <Rectangle Grid.Row="0" Fill="#FF8C00"/>
+        <Rectangle Grid.Row="1" Fill="White"/>
+
+        <Border Grid.Row="0" Grid.RowSpan="2"
+                Background="White"
+                CornerRadius="16"
+                Padding="40"
+                Width="500"
+                VerticalAlignment="Center"
+                HorizontalAlignment="Center">
+            <Border.Effect>
+                <DropShadowEffect BlurRadius="20" ShadowDepth="4" Opacity="0.15" Color="Black"/>
+            </Border.Effect>
+
+            <StackPanel>
+
+                <!-- Header -->
+                <TextBlock Text="Welcome bij MoreConnector"
+                           FontSize="13"
+                           Foreground="#333333"
+                           Margin="0,0,0,4"/>
+
+                <!-- Title -->
+                <TextBlock Text="Maak je account aan"
+                           FontSize="36"
+                           FontWeight="Bold"
+                           Foreground="#111111"
+                           Margin="0,0,0,16"/>
+
+                <!-- Voornaam -->
+                <TextBlock Text="Voornaam"
+                           FontSize="12"
+                           Foreground="#333333"
+                           Margin="0,0,0,6"/>
+                <Border BorderBrush="#4A90D9"
+                        BorderThickness="1.5"
+                        CornerRadius="6"
+                        Margin="0,0,0,14">
+                    <TextBox x:Name="TxtVoornaam"
+                             Text="Voornaam"
+                             Foreground="Gray"
+                             BorderThickness="0"
+                             Padding="10,8"
+                             FontSize="13"
+                             Background="Transparent"
+                             GotFocus="TxtVoornaam_GotFocus"
+                             LostFocus="TxtVoornaam_LostFocus"/>
+                </Border>
+
+                <!-- Achternaam -->
+                <TextBlock Text="Achternaam"
+                           FontSize="12"
+                           Foreground="#333333"
+                           Margin="0,0,0,6"/>
+                <Border BorderBrush="#4A90D9"
+                        BorderThickness="1.5"
+                        CornerRadius="6"
+                        Margin="0,0,0,14">
+                    <TextBox x:Name="TxtAchternaam"
+                             Text="Achternaam"
+                             Foreground="Gray"
+                             BorderThickness="0"
+                             Padding="10,8"
+                             FontSize="13"
+                             Background="Transparent"
+                             GotFocus="TxtAchternaam_GotFocus"
+                             LostFocus="TxtAchternaam_LostFocus"/>
+                </Border>
+
+                <!-- Email -->
+                <TextBlock Text="email-adres"
+                           FontSize="12"
+                           Foreground="#333333"
+                           Margin="0,0,0,6"/>
+                <Border BorderBrush="#4A90D9"
+                        BorderThickness="1.5"
+                        CornerRadius="6"
+                        Margin="0,0,0,14">
+                    <TextBox x:Name="TxtEmail"
+                             Text="email-adres"
+                             Foreground="Gray"
+                             BorderThickness="0"
+                             Padding="10,8"
+                             FontSize="13"
+                             Background="Transparent"
+                             GotFocus="TxtEmail_GotFocus"
+                             LostFocus="TxtEmail_LostFocus"/>
+                </Border>
+
+                <!-- Wachtwoord -->
+                <TextBlock Text="wachtwoord"
+                           FontSize="12"
+                           Foreground="#333333"
+                           Margin="0,0,0,6"/>
+                <Border BorderBrush="#4A90D9"
+                        BorderThickness="1.5"
+                        CornerRadius="6"
+                        Margin="0,0,0,14">
+                    <PasswordBox x:Name="TxtWachtwoord"
+                                 BorderThickness="0"
+                                 Padding="10,8"
+                                 FontSize="13"
+                                 Background="Transparent"/>
+                </Border>
+
+                <!-- Telefoonnummer + Studierichting -->
+                <Grid Margin="0,0,0,24">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Telefoonnummer -->
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="telefoonnummer"
+                                   FontSize="12"
+                                   Foreground="#333333"
+                                   Margin="0,0,0,6"/>
+                        <Border BorderBrush="#4A90D9"
+                                BorderThickness="1.5"
+                                CornerRadius="6">
+                            <TextBox x:Name="TxtTelefoon"
+                                     Text="telefoonnummer"
+                                     Foreground="Gray"
+                                     BorderThickness="0"
+                                     Padding="10,8"
+                                     FontSize="13"
+                                     Background="Transparent"
+                                     GotFocus="TxtTelefoon_GotFocus"
+                                     LostFocus="TxtTelefoon_LostFocus"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Studierichting -->
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="studierichting"
+                                   FontSize="12"
+                                   Foreground="#333333"
+                                   Margin="0,0,0,6"/>
+                        <Border BorderBrush="#4A90D9"
+                                BorderThickness="1.5"
+                                CornerRadius="6">
+                            <TextBox x:Name="TxtStudierichting"
+                                     Text="studierichting"
+                                     Foreground="Gray"
+                                     BorderThickness="0"
+                                     Padding="10,8"
+                                     FontSize="13"
+                                     Background="Transparent"
+                                     GotFocus="TxtStudierichting_GotFocus"
+                                     LostFocus="TxtStudierichting_LostFocus"/>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Submit Button -->
+                <Button x:Name="BtnCreate"
+                        Content="maak je account aan"
+                        Background="#1B2A3B"
+                        Foreground="White"
+                        FontSize="14"
+                        FontWeight="Bold"
+                        Height="48"
+                        Cursor="Hand"
+                        BorderThickness="0"
+                        Click="BtnCreate_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="8"
+                                    Padding="10">
+                                <ContentPresenter HorizontalAlignment="Center"
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
