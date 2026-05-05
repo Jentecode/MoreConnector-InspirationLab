@@ -1,0 +1,15 @@
+﻿<Window x:Class="MoreConnector.Views.MoreConnector"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="MoreConnector"
+        WindowStartupLocation="CenterScreen"
+        WindowState="Maximized"
+        ResizeMode="CanResize"
+        MinWidth="800"
+        MinHeight="600"
+        MaxWidth="2560"
+        MaxHeight="1440">
+    <Grid>
+        <Frame x:Name="AuthFrame" NavigationUIVisibility="Hidden"/>
+    </Grid>
+</Window>

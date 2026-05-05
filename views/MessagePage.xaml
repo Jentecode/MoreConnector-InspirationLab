@@ -1,0 +1,301 @@
+﻿<Page x:Class="MoreConnector.Views.MessagePage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+      mc:Ignorable="d"
+      d:DesignWidth="1120" d:DesignHeight="650"
+      Title="Berichten">
+
+    <Page.Resources>
+        <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
+        <SolidColorBrush x:Key="NavyBrush"      Color="#1B2A3B"/>
+        <SolidColorBrush x:Key="CardBrush"      Color="#1E2E40"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
+        <SolidColorBrush x:Key="OnlineGreen"    Color="Green"/>
+
+        <Style x:Key="NavButtonStyle" TargetType="Button">
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="Foreground"                 Value="{StaticResource WhiteBrush}"/>
+            <Setter Property="FontSize"                   Value="16"/>
+            <Setter Property="FontWeight"                 Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding"                    Value="16,10"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                Padding="{TemplateBinding Padding}"
+                                CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#CC5200"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#993D00"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="AvatarStyle" TargetType="Ellipse">
+            <Setter Property="Width"  Value="48"/>
+            <Setter Property="Height" Value="48"/>
+            <Setter Property="Fill"   Value="{StaticResource LightGrayBrush}"/>
+        </Style>
+
+        <Style x:Key="SmallAvatarStyle" TargetType="Ellipse" BasedOn="{StaticResource AvatarStyle}">
+            <Setter Property="Width"  Value="36"/>
+            <Setter Property="Height" Value="36"/>
+        </Style>
+
+        <Style x:Key="ContactButtonStyle" TargetType="Button">
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
+            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+            <Setter Property="Padding"                    Value="8,6"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#1E2E40"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="280"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <Grid Grid.Column="0" Background="{StaticResource OrangeBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="0" Margin="0,24,0,0">
+                <Button Content="Home"         Style="{StaticResource NavButtonStyle}" Click="OnHomeClick"/>
+                <Button Content="Activiteiten" Style="{StaticResource NavButtonStyle}" Click="OnActiviteitenClick"/>
+                <Button Content="Berichten"    Style="{StaticResource NavButtonStyle}" Click="OnBerichtenClick"/>
+                <Button Content="Aanmaken"     Style="{StaticResource NavButtonStyle}" Click="OnAanmakenClick"/>
+            </StackPanel>
+
+            <Button Grid.Row="1" Style="{StaticResource NavButtonStyle}" Margin="8,0,8,16" Click="OnProfielClick">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Style="{StaticResource SmallAvatarStyle}" Margin="0,0,10,0"/>
+                    <TextBlock Text="Profiel" Foreground="{StaticResource WhiteBrush}"
+                               FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
+        </Grid>
+
+        <!-- CONTACTS PANEEL -->
+        <Grid Grid.Column="1" Background="{StaticResource CardBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- Zoekbalk — geen Foreground hier, wordt door code-behind beheerd -->
+            <Border Grid.Row="0" Background="{StaticResource LightGrayBrush}"
+                    CornerRadius="6" Margin="12,16,12,12" Padding="10,8">
+                <TextBox x:Name="ZoekBox"
+                         Background="Transparent" BorderThickness="0"
+                         FontSize="14"
+                         GotFocus="ZoekBox_GotFocus"
+                         LostFocus="ZoekBox_LostFocus"
+                         TextChanged="ZoekBox_TextChanged"/>
+            </Border>
+
+            <!-- Contactenlijst -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="12,0,12,12">
+                <StackPanel>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,8,0,8">
+                        <Button Content="+"
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="{StaticResource WhiteBrush}"
+                                FontSize="20" FontWeight="Bold"
+                                Cursor="Hand" Padding="0,0,6,0"
+                                Click="OnNieuwBerichtClick"/>
+                        <TextBlock Text="Berichten"
+                                   Foreground="{StaticResource WhiteBrush}"
+                                   FontSize="18" FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ItemsControl x:Name="BerichtenContactenPanel">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource ContactButtonStyle}"
+                                        Tag="{Binding}"
+                                        Click="OnContactClick">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid Grid.Column="0" Margin="0,0,10,0">
+                                            <Ellipse Style="{StaticResource SmallAvatarStyle}"/>
+                                            <Ellipse Width="10" Height="10"
+                                                     Fill="{StaticResource OnlineGreen}"
+                                                     HorizontalAlignment="Right"
+                                                     VerticalAlignment="Bottom"/>
+                                        </Grid>
+
+                                        <Border Grid.Column="1"
+                                                Background="{StaticResource LightGrayBrush}"
+                                                CornerRadius="6" Padding="10,8"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Naam}"
+                                                       FontSize="14" Foreground="#333333"/>
+                                        </Border>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <StackPanel Orientation="Horizontal" Margin="0,16,0,8">
+                        <Button Content="+"
+                                Background="Transparent" BorderThickness="0"
+                                Foreground="{StaticResource WhiteBrush}"
+                                FontSize="20" FontWeight="Bold"
+                                Cursor="Hand" Padding="0,0,6,0"
+                                Click="OnNieuweGroepClick"/>
+                        <TextBlock Text="Groepen"
+                                   Foreground="{StaticResource WhiteBrush}"
+                                   FontSize="18" FontWeight="Bold"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+
+                    <ItemsControl x:Name="GroepenPanel">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Button Style="{StaticResource ContactButtonStyle}"
+                                        Tag="{Binding}"
+                                        Click="OnGroepClick">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <Grid Grid.Column="0" Margin="0,0,10,0">
+                                            <Ellipse Style="{StaticResource SmallAvatarStyle}"/>
+                                        </Grid>
+
+                                        <Border Grid.Column="1"
+                                                Background="{StaticResource LightGrayBrush}"
+                                                CornerRadius="6" Padding="10,8"
+                                                VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Naam}"
+                                                       FontSize="14" Foreground="#333333"/>
+                                        </Border>
+                                    </Grid>
+                                </Button>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+            </ScrollViewer>
+        </Grid>
+
+        <!-- CHAT PANEEL -->
+        <Grid Grid.Column="2" Background="{StaticResource NavyBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="60"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+
+            <Border Grid.Row="0" Background="{StaticResource CardBrush}" Padding="16,0">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Ellipse Style="{StaticResource SmallAvatarStyle}" Margin="0,0,12,0"/>
+                    <TextBlock x:Name="ChatNaamText"
+                               Text=""
+                               Foreground="{StaticResource WhiteBrush}"
+                               FontSize="16" FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer x:Name="ChatScrollViewer"
+                          Grid.Row="1"
+                          VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled"
+                          Padding="16,12">
+                <StackPanel x:Name="ChatPanel"/>
+            </ScrollViewer>
+
+            <!-- Invoerbalk — geen Foreground hier, wordt door code-behind beheerd -->
+            <Grid Grid.Row="2" Margin="16,8,16,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Background="{StaticResource LightGrayBrush}"
+                        CornerRadius="6" Padding="12,8" Margin="0,0,10,0">
+                    <TextBox x:Name="BerichtInput"
+                             Background="Transparent" BorderThickness="0"
+                             FontSize="14"
+                             VerticalContentAlignment="Center"
+                             GotFocus="BerichtInput_GotFocus"
+                             LostFocus="BerichtInput_LostFocus"
+                             KeyDown="BerichtInput_KeyDown"/>
+                </Border>
+
+                <Button Grid.Column="1"
+                        Content="Stuur"
+                        Background="{StaticResource OrangeBrush}"
+                        Foreground="{StaticResource WhiteBrush}"
+                        FontSize="14" FontWeight="SemiBold"
+                        BorderThickness="0"
+                        Padding="20,10"
+                        Cursor="Hand"
+                        Click="OnStuurClick">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="6"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="#CC5200"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+            </Grid>
+        </Grid>
+    </Grid>
+</Page>
