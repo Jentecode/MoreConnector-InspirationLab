@@ -1,0 +1,115 @@
+<UserControl x:Class="MoreConnector.Views.Sidebar"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
+        <SolidColorBrush x:Key="ActiveBrush"    Color="#993D00"/>
+        <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+
+        <Style x:Key="NavBtn" TargetType="Button">
+            <Setter Property="Background"                 Value="Transparent"/>
+            <Setter Property="Foreground"                 Value="{StaticResource WhiteBrush}"/>
+            <Setter Property="FontSize"                   Value="15"/>
+            <Setter Property="FontWeight"                 Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding"                    Value="16,11"/>
+            <Setter Property="BorderThickness"            Value="0"/>
+            <Setter Property="Cursor"                     Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bdr"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#CC5200"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#993D00"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Actieve pagina = donkerder -->
+        <Style x:Key="NavBtnActive" BasedOn="{StaticResource NavBtn}" TargetType="Button">
+            <Setter Property="Background" Value="#993D00"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="{StaticResource OrangeBrush}" Width="180">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>  <!-- Logo/titel -->
+            <RowDefinition Height="*"/>     <!-- Nav knoppen -->
+            <RowDefinition Height="Auto"/>  <!-- Profiel + uitloggen -->
+        </Grid.RowDefinitions>
+
+        <!-- Logo -->
+        <TextBlock Grid.Row="0"
+                   Text="More&#10;Connector"
+                   Foreground="{StaticResource WhiteBrush}"
+                   FontSize="18" FontWeight="Bold"
+                   TextAlignment="Center"
+                   Margin="12,20,12,16"
+                   LineHeight="22"/>
+
+        <!-- Nav knoppen -->
+        <StackPanel Grid.Row="1" Margin="8,0,8,0">
+            <Button x:Name="BtnHome"         Content="🏠  Home"         Style="{StaticResource NavBtn}" Click="OnHome"/>
+            <Button x:Name="BtnActiviteiten" Content="🎉  Activiteiten" Style="{StaticResource NavBtn}" Click="OnActiviteiten"/>
+            <Button x:Name="BtnBerichten"    Content="💬  Berichten"    Style="{StaticResource NavBtn}" Click="OnBerichten"/>
+            <Button x:Name="BtnAanmaken"     Content="✏️  Aanmaken"     Style="{StaticResource NavBtn}" Click="OnAanmaken"/>
+            <!-- Admin knop: alleen zichtbaar als admin -->
+            <Button x:Name="BtnAdmin"        Content="🛡️  Beheer"       Style="{StaticResource NavBtn}" Click="OnAdmin"
+                    Visibility="Collapsed"/>
+        </StackPanel>
+
+        <!-- Onder: profielfoto + naam + uitloggen -->
+        <StackPanel Grid.Row="2" Margin="8,0,8,12">
+            <Button x:Name="BtnProfiel" Style="{StaticResource NavBtn}" Click="OnProfiel" Padding="8,8">
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <!-- Avatar met echte foto -->
+                    <Grid Width="36" Height="36" Margin="0,0,10,0">
+                        <Ellipse x:Name="AvatarAchtergrond"
+                                 Width="36" Height="36"
+                                 Fill="{StaticResource LightGrayBrush}"/>
+                        <Image x:Name="AvatarImage"
+                               Width="36" Height="36"
+                               Stretch="UniformToFill"
+                               RenderOptions.BitmapScalingMode="HighQuality">
+                            <Image.Clip>
+                                <EllipseGeometry Center="18,18" RadiusX="18" RadiusY="18"/>
+                            </Image.Clip>
+                        </Image>
+                    </Grid>
+                    <StackPanel VerticalAlignment="Center">
+                        <TextBlock x:Name="GebruikerNaamLabel"
+                                   Text="Profiel"
+                                   Foreground="{StaticResource WhiteBrush}"
+                                   FontSize="14" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="GebruikerRolLabel"
+                                   Text=""
+                                   Foreground="#FFDDBB"
+                                   FontSize="11"/>
+                    </StackPanel>
+                </StackPanel>
+            </Button>
+
+            <!-- Uitloggen -->
+            <Button x:Name="BtnUitloggen"
+                    Content="🚪  Uitloggen"
+                    Style="{StaticResource NavBtn}"
+                    Click="OnUitloggen"
+                    Foreground="#FFDDBB"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

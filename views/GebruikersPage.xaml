@@ -1,0 +1,111 @@
+<Page x:Class="MoreConnector.Views.GebruikersPage"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      Title="Gebruikers">
+
+    <Page.Resources>
+        <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
+        <SolidColorBrush x:Key="NavyBrush"      Color="#1B2A3B"/>
+        <SolidColorBrush x:Key="CardBrush"      Color="#1E2E40"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
+        <SolidColorBrush x:Key="MutedBrush"     Color="#8899AA"/>
+        <Style x:Key="SideNavBtn" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Margin" Value="0,1,0,1"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#CC5200"/></Trigger>
+                            <Trigger Property="IsPressed"   Value="True"><Setter Property="Background" Value="#993D00"/></Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Page.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="180"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- SIDEBAR -->
+        <Grid x:Name="SidebarGrid" Grid.Column="0" Background="{StaticResource OrangeBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
+            <TextBlock Grid.Row="0" Text="More&#10;Connector" Foreground="White"
+                       FontSize="16" FontWeight="Bold" TextAlignment="Center" Margin="12,20,12,12" LineHeight="20"/>
+            <StackPanel Grid.Row="1" Margin="6,0,6,0">
+                <Button x:Name="BtnHome"         Content="🏠  Home"         Style="{StaticResource SideNavBtn}" Click="SideNav_Home"/>
+                <Button x:Name="BtnActiviteiten" Content="🎉  Activiteiten" Style="{StaticResource SideNavBtn}" Click="SideNav_Activiteiten"/>
+                <Button x:Name="BtnBerichten"    Content="💬  Berichten"    Style="{StaticResource SideNavBtn}" Click="SideNav_Berichten"/>
+                <Button x:Name="BtnGebruikers"   Content="👥  Gebruikers"   Style="{StaticResource SideNavBtn}" Click="SideNav_Gebruikers" Background="#993D00"/>
+                <Button x:Name="BtnAanmaken"     Content="✏️  Aanmaken"     Style="{StaticResource SideNavBtn}" Click="SideNav_Aanmaken"/>
+                <Button x:Name="BtnAdmin"        Content="🛡️  Beheer"       Style="{StaticResource SideNavBtn}" Click="SideNav_Admin" Visibility="Collapsed"/>
+            </StackPanel>
+            <StackPanel Grid.Row="2" Margin="6,0,6,12">
+                <Button x:Name="BtnProfiel" Style="{StaticResource SideNavBtn}" Click="SideNav_Profiel" Padding="8,8">
+                    <StackPanel Orientation="Horizontal">
+                        <Grid Width="32" Height="32" Margin="0,0,8,0">
+                            <Ellipse x:Name="SideAvatarBg" Width="32" Height="32" Fill="#AAAAAA"/>
+                            <Image x:Name="SideAvatarImg" Width="32" Height="32" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality">
+                                <Image.Clip><EllipseGeometry Center="16,16" RadiusX="16" RadiusY="16"/></Image.Clip>
+                            </Image>
+                        </Grid>
+                        <StackPanel VerticalAlignment="Center">
+                            <TextBlock x:Name="SideNaamLabel" Text="Profiel" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="SideRolLabel"  Text=""         Foreground="#FFDDBB" FontSize="11"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Button>
+                <Button x:Name="BtnUitloggen" Content="🚪  Uitloggen" Style="{StaticResource SideNavBtn}" Click="SideNav_Uitloggen" Foreground="#FFDDBB"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- MAIN -->
+        <Grid Grid.Column="1" Background="{StaticResource NavyBrush}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <!-- TOP BAR -->
+            <Grid Grid.Row="0" Margin="32,28,32,20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Column="0" Text="👥  Gebruikers" Foreground="White"
+                           FontSize="26" FontWeight="Bold" VerticalAlignment="Center"/>
+                <Border Grid.Column="1" Background="White" CornerRadius="20" Padding="14,7">
+                    <TextBox x:Name="ZoekBox" Background="Transparent" BorderThickness="0"
+                             FontSize="14" MinWidth="220"
+                             GotFocus="ZoekBox_GotFocus" LostFocus="ZoekBox_LostFocus"
+                             TextChanged="ZoekBox_TextChanged"/>
+                </Border>
+            </Grid>
+
+            <!-- GEBRUIKERSLIJST -->
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
+                          HorizontalScrollBarVisibility="Disabled" Padding="32,0,32,24">
+                <StackPanel x:Name="GebruikersPanel"/>
+            </ScrollViewer>
+        </Grid>
+    </Grid>
+</Page>

@@ -1,4 +1,6 @@
-﻿using System.Windows;
+using MoreConnector.Database;
+using MoreConnector.Models;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -103,8 +105,51 @@ namespace MoreConnector
 
         private void BtnCreate_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Account aangemaakt!");
-            ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
+            string voornaam = TxtVoornaam.Text.Trim();
+            string achternaam = TxtAchternaam.Text.Trim();
+            string email = TxtEmail.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(voornaam) || voornaam == "Voornaam" ||
+                string.IsNullOrWhiteSpace(achternaam) || achternaam == "Achternaam")
+            {
+                MessageBox.Show("Voornaam en achternaam zijn verplicht.", "Validatiefout",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(email) || email == "email-adres" || !email.Contains("@"))
+            {
+                MessageBox.Show("Vul een geldig e-mailadres in.", "Validatiefout",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (TxtWachtwoord.Password.Length == 0)
+            {
+                MessageBox.Show("Vul een wachtwoord in.", "Validatiefout",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                string studierichting = TxtStudierichting.Text.Trim();
+                if (studierichting == "Studierichting") studierichting = "";
+
+                int newId = UserRepository.Registreer(
+                    voornaam, achternaam, email,
+                    TxtWachtwoord.Password,
+                    studierichting);
+
+                MessageBox.Show("Account aangemaakt! Je kunt nu inloggen.", "Succes",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Fout bij aanmaken account:\n{ex.Message}", "Fout",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
         private void TxtWachtwoord_PasswordChanged(object sender, RoutedEventArgs e)

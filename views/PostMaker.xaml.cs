@@ -6,36 +6,13 @@ using System.Windows.Media;
 
 namespace MoreConnector.Views
 {
-    public partial class ActivityMaker : Page
+    public partial class PostMaker : Page
     {
         private string _afbeeldingPad = "";
         private readonly List<string> _tags = new();
         private readonly AppState _state = AppState.Instance;
 
-        public ActivityMaker() { InitializeComponent(); }
-
-        private void OnAanmakenBevestigenClick(object sender, RoutedEventArgs e)
-        {
-            string naam        = NaamInput.Text.Trim();
-            string categorie   = CategorieInput.Text.Trim();
-            string datumTijd   = DatumTijdInput.Text.Trim();
-            string locatie     = LocatieInput.Text.Trim();
-            string beschrijving = BeschrijvingInput.Text.Trim();
-
-            if (string.IsNullOrEmpty(naam) || string.IsNullOrEmpty(locatie) || string.IsNullOrEmpty(datumTijd))
-            {
-                MessageBox.Show("Vul minstens een naam, locatie en datum & tijd in.", "Validatie");
-                return;
-            }
-
-            string auteur = _state.HuidigeGebruiker?.DisplayNaam ?? "Onbekend";
-            string tagStr = _tags.Count > 0 ? " · " + string.Join(" ", _tags.ConvertAll(t => $"#{t}")) : "";
-
-            // ── Evenement gaat naar Activiteiten-pagina (en Admin), NIET naar Feed ──
-            _state.VoegEvenementToe(naam, locatie, datumTijd, beschrijving + tagStr, auteur, _afbeeldingPad);
-
-            Nav().AuthFrame.Navigate(new ActivityPage());
-        }
+        public PostMaker() { InitializeComponent(); }
 
         private void OnAfbeeldingClick(object sender, RoutedEventArgs e)
         {
@@ -66,27 +43,56 @@ namespace MoreConnector.Views
 
             var chip = new Border
             {
-                Background  = new SolidColorBrush(Color.FromRgb(204, 82, 0)),
-                CornerRadius = new CornerRadius(12),
-                Padding     = new Thickness(10, 4, 10, 4),
-                Margin      = new Thickness(0, 0, 6, 6)
+                Background   = new SolidColorBrush(Color.FromRgb(204, 82, 0)),
+                CornerRadius  = new CornerRadius(12),
+                Padding      = new Thickness(10, 4, 10, 4),
+                Margin       = new Thickness(0, 0, 6, 6)
             };
             var inner = new StackPanel { Orientation = Orientation.Horizontal };
             inner.Children.Add(new TextBlock
             {
-                Text = $"#{tag}", Foreground = new SolidColorBrush(Colors.White),
-                FontSize = 13, VerticalAlignment = VerticalAlignment.Center
+                Text       = $"#{tag}",
+                Foreground = new SolidColorBrush(Colors.White),
+                FontSize   = 13,
+                VerticalAlignment = VerticalAlignment.Center
             });
             var verwijder = new Button
             {
-                Content = " ×", Background = Brushes.Transparent,
-                BorderThickness = new Thickness(0), Foreground = new SolidColorBrush(Colors.White),
-                FontSize = 14, Cursor = System.Windows.Input.Cursors.Hand, Tag = tag
+                Content         = " ×",
+                Background      = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Foreground      = new SolidColorBrush(Colors.White),
+                FontSize        = 14,
+                Cursor          = System.Windows.Input.Cursors.Hand,
+                Tag             = tag
             };
-            verwijder.Click += (_, _) => { _tags.Remove(tag); TagsPanel.Children.Remove(chip); };
+            verwijder.Click += (_, _) =>
+            {
+                _tags.Remove(tag);
+                TagsPanel.Children.Remove(chip);
+            };
             inner.Children.Add(verwijder);
             chip.Child = inner;
             TagsPanel.Children.Add(chip);
+        }
+
+        private void OnPostDelenClick(object sender, RoutedEventArgs e)
+        {
+            string beschrijving = BeschrijvingInput.Text.Trim();
+            if (string.IsNullOrEmpty(beschrijving))
+            {
+                MessageBox.Show("Voer een beschrijving in.", "Validatie");
+                return;
+            }
+
+            string auteur = _state.HuidigeGebruiker?.DisplayNaam ?? "Onbekend";
+
+            // Tags toevoegen aan beschrijving
+            string tagStr = _tags.Count > 0 ? "\n" + string.Join(" ", _tags.ConvertAll(t => $"#{t}")) : "";
+
+            _state.VoegPostToe(auteur, beschrijving + tagStr, _afbeeldingPad);
+
+            Nav().AuthFrame.Navigate(new Feed());
         }
 
         private void OnAnnulerenClick(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new AanmakenKeuze());
@@ -100,8 +106,8 @@ namespace MoreConnector.Views
         private void OnBeschrijvingChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
         {
             int len = BeschrijvingInput.Text.Length;
-            BeschrijvingTeller.Text = $"{len} / 300";
-            BeschrijvingTeller.Foreground = len > 250
+            BeschrijvingTeller.Text = $"{len} / 500";
+            BeschrijvingTeller.Foreground = len > 450
                 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Tomato)
                 : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(170,170,170));
         }

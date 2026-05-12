@@ -1,7 +1,7 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
+
 namespace MoreConnector
 {
     public partial class PasswordReset : Page
@@ -10,6 +10,7 @@ namespace MoreConnector
         {
             InitializeComponent();
         }
+
         private void TxtEmail_GotFocus(object sender, RoutedEventArgs e)
         {
             if (TxtEmail.Text == "gebruikersnaam of email-adres")
@@ -18,6 +19,7 @@ namespace MoreConnector
                 TxtEmail.Foreground = Brushes.Black;
             }
         }
+
         private void TxtEmail_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(TxtEmail.Text))
@@ -26,9 +28,20 @@ namespace MoreConnector
                 TxtEmail.Foreground = Brushes.Gray;
             }
         }
+
         private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Mail verstuurd!");
+            string email = TxtEmail.Text.Trim();
+
+            if (string.IsNullOrWhiteSpace(email) || email == "gebruikersnaam of email-adres" || !email.Contains("@"))
+            {
+                MessageBox.Show("Vul een geldig e-mailadres in.", "Validatiefout",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            // TODO: stuur reset-mail via backend
+            MessageBox.Show("Mail verstuurd!", "Succes", MessageBoxButton.OK, MessageBoxImage.Information);
             ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
         }
     }

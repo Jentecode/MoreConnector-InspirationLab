@@ -1,13 +1,14 @@
-<Page x:Class="MoreConnector.Views.ActivityMaker"
+<Page x:Class="MoreConnector.Views.PostMaker"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      Title="Evenement aanmaken">
+      Title="Post aanmaken">
 
     <Page.Resources>
         <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
         <SolidColorBrush x:Key="NavyBrush"      Color="#1B2A3B"/>
-        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="CardBrush"      Color="#1E2E40"/>
         <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
 
 
 
@@ -23,6 +24,13 @@
             <Setter Property="Padding"         Value="12,10"/>
             <Setter Property="FontSize"        Value="14"/>
             <Setter Property="Foreground"      Value="#333333"/>
+        </Style>
+
+        <Style x:Key="TagChipStyle" TargetType="Border">
+            <Setter Property="Background"   Value="#CC5200"/>
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding"      Value="10,4"/>
+            <Setter Property="Margin"       Value="0,0,6,6"/>
         </Style>
         <Style x:Key="SideNavBtn" TargetType="Button">
             <Setter Property="Background"                 Value="Transparent"/>
@@ -113,50 +121,16 @@
             </StackPanel>
         </Grid>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN -->
         <ScrollViewer Grid.Column="1" Background="{StaticResource NavyBrush}"
                       VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
                       Padding="48,32,48,32">
             <StackPanel>
 
-                <TextBlock Text="Nieuw evenement aanmaken"
+                <TextBlock Text="Nieuwe post aanmaken"
                            Foreground="{StaticResource WhiteBrush}"
                            FontSize="22" FontWeight="Bold"
                            Margin="0,0,0,32"/>
-
-                <!-- Naam + Categorie -->
-                <Grid Margin="0,0,0,20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="32"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Naam" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="NaamInput" Style="{StaticResource InputStyle}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Categorie" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="CategorieInput" Style="{StaticResource InputStyle}"/>
-                    </StackPanel>
-                </Grid>
-
-                <!-- Datum & Locatie -->
-                <Grid Margin="0,0,0,20">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="32"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Datum &amp; Tijd" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="DatumTijdInput" Style="{StaticResource InputStyle}"/>
-                    </StackPanel>
-                    <StackPanel Grid.Column="2">
-                        <TextBlock Text="Locatie" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="LocatieInput" Style="{StaticResource InputStyle}"/>
-                    </StackPanel>
-                </Grid>
 
                 <!-- Beschrijving -->
                 <Grid Margin="0,0,0,6">
@@ -166,23 +140,27 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="Beschrijving" Style="{StaticResource LabelStyle}" Margin="0"/>
                     <TextBlock x:Name="BeschrijvingTeller" Grid.Column="1"
-                               Text="0 / 300"
+                               Text="0 / 500"
                                Foreground="#AAAAAA" FontSize="12"
                                VerticalAlignment="Center"/>
                 </Grid>
                 <TextBox x:Name="BeschrijvingInput"
                          Style="{StaticResource InputStyle}"
-                         Height="100" MaxLength="300"
-                         TextWrapping="Wrap" AcceptsReturn="True"
+                         Height="140"
+                         MaxLength="500"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
                          VerticalScrollBarVisibility="Auto"
                          Margin="0,0,0,4"
                          TextChanged="OnBeschrijvingChanged"/>
-                <TextBlock Text="Max. 300 tekens."
+                <TextBlock Text="Max. 500 tekens."
                            Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,20"/>
 
                 <!-- Afbeelding: aanbevolen grootte -->
-                <TextBlock Text="Afbeelding  ·  Aanbevolen: 1920 × 1080 px  (max. 5 MB)"
+                <TextBlock Text="Afbeelding  ·  Aanbevolen: 1080 × 1080 px  (max. 5 MB)"
                            Foreground="#AAAAAA" FontSize="11" Margin="0,0,0,4"/>
+
+
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,20">
                     <Button x:Name="AfbeeldingButton"
                             Content="+ Kies afbeelding"
@@ -215,7 +193,8 @@
                         <TextBox x:Name="TagInput"
                                  Background="Transparent" BorderThickness="0"
                                  Foreground="{StaticResource WhiteBrush}"
-                                 FontSize="13" Padding="10,6" MinWidth="160"
+                                 FontSize="13" Padding="10,6"
+                                 MinWidth="160"
                                  VerticalContentAlignment="Center"/>
                     </Border>
                     <Button Content="+ Voeg toe"
@@ -233,13 +212,13 @@
                 </StackPanel>
                 <WrapPanel x:Name="TagsPanel" Margin="0,0,0,24"/>
 
-                <!-- Aanmaken + Annuleren -->
+                <!-- Buttons -->
                 <StackPanel Orientation="Horizontal">
-                    <Button Content="Evenement aanmaken"
+                    <Button Content="Post delen"
                             Background="{StaticResource OrangeBrush}" Foreground="{StaticResource WhiteBrush}"
                             FontSize="14" FontWeight="SemiBold" BorderThickness="0"
                             Padding="24,10" Cursor="Hand" Margin="0,0,12,0"
-                            Click="OnAanmakenBevestigenClick">
+                            Click="OnPostDelenClick">
                         <Button.Template>
                             <ControlTemplate TargetType="Button">
                                 <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">

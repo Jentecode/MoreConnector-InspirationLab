@@ -1,20 +1,24 @@
-<Page x:Class="MoreConnector.Views.ActivityPage"
+<Page x:Class="MoreConnector.Views.AanmakenKeuze"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-      mc:Ignorable="d"
-      d:DesignWidth="1120" d:DesignHeight="650"
-      Title="Activiteiten">
+      Title="Aanmaken">
 
     <Page.Resources>
         <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
         <SolidColorBrush x:Key="NavyBrush"      Color="#1B2A3B"/>
-        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="CardBrush"      Color="#1E2E40"/>
         <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
 
 
 
+        <Style x:Key="KeuzeKaartStyle" TargetType="Border">
+            <Setter Property="Background"    Value="{StaticResource CardBrush}"/>
+            <Setter Property="CornerRadius"  Value="16"/>
+            <Setter Property="Padding"       Value="40,48"/>
+            <Setter Property="Cursor"        Value="Hand"/>
+            <Setter Property="Width"         Value="280"/>
+        </Style>
         <Style x:Key="SideNavBtn" TargetType="Button">
             <Setter Property="Background"                 Value="Transparent"/>
             <Setter Property="Foreground"                 Value="White"/>
@@ -104,89 +108,54 @@
             </StackPanel>
         </Grid>
 
-        <!-- MAIN CONTENT -->
+        <!-- MAIN -->
         <Grid Grid.Column="1" Background="{StaticResource NavyBrush}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
 
-            <!-- TOP BAR -->
-            <Grid Grid.Row="0" Margin="32,28,32,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
+                <TextBlock Text="Wat wil je aanmaken?"
+                           Foreground="{StaticResource WhiteBrush}"
+                           FontSize="26" FontWeight="Bold"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,48"/>
 
-                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="Goedemiddag, "
-                               Foreground="{StaticResource WhiteBrush}"
-                               FontSize="28" FontWeight="Bold"/>
-                    <TextBlock x:Name="UsernameText"
-                               Text="Jente"
-                               Foreground="{StaticResource OrangeBrush}"
-                               FontSize="28" FontWeight="Bold"/>
-                </StackPanel>
+                <StackPanel Orientation="Horizontal">
 
-                <Border Grid.Column="1" Background="{StaticResource WhiteBrush}"
-                        CornerRadius="20" Padding="14,6" Margin="0,0,16,0">
-                    <TextBox x:Name="SearchBox"
-                             Background="Transparent" BorderThickness="0"
-                             FontSize="14" VerticalContentAlignment="Center"
-                             MinWidth="200"
-                             GotFocus="SearchBox_GotFocus"
-                             LostFocus="SearchBox_LostFocus"
-                             TextChanged="SearchBox_TextChanged"/>
-                </Border>
+                    <!-- POST kaart -->
+                    <Border Style="{StaticResource KeuzeKaartStyle}" Margin="0,0,32,0" MouseLeftButtonUp="OnPostKeuze">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="📝" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                            <TextBlock Text="Post"
+                                       Foreground="{StaticResource WhiteBrush}"
+                                       FontSize="22" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="Deel een bericht, foto of gedachte met je connecties."
+                                       Foreground="#AAAAAA"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
-                <Button Grid.Column="2" Background="Transparent" BorderThickness="0"
-                        Cursor="Hand" Click="OnProfielAvatarClick">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Grid Width="48" Height="48" VerticalAlignment="Center">
-                                <Ellipse x:Name="TopbarAvatarBg" Width="48" Height="48" Fill="{StaticResource LightGrayBrush}"/>
-                                <Image x:Name="TopbarAvatarImg" Width="48" Height="48" Stretch="UniformToFill"
-                                       RenderOptions.BitmapScalingMode="HighQuality">
-                                    <Image.Clip><EllipseGeometry Center="24,24" RadiusX="24" RadiusY="24"/></Image.Clip>
-                                </Image>
-                            </Grid>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-            </Grid>
-
-            <!-- ACTIVITEITEN -->
-            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto"
-                          HorizontalScrollBarVisibility="Disabled" Margin="32,24,32,24">
-                <StackPanel>
-
-                    <Grid Margin="0,0,0,16">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Grid.Column="0"
-                                   Text="Aanbevolen Activiteiten"
-                                   Foreground="{StaticResource WhiteBrush}"
-                                   FontSize="16" FontWeight="Bold"
-                                   VerticalAlignment="Center"/>
-
-                        <Button Grid.Column="1"
-                                x:Name="BekijkAllesButton"
-                                Content="bekijk alles →"
-                                Background="Transparent" BorderThickness="0"
-                                Foreground="{StaticResource OrangeBrush}"
-                                FontSize="14" Cursor="Hand"
-                                Click="OnBekijkAllesClick"/>
-                    </Grid>
-
-                    <WrapPanel x:Name="PostPanel" Orientation="Horizontal">
-                    </WrapPanel>
+                    <!-- EVENT kaart -->
+                    <Border Style="{StaticResource KeuzeKaartStyle}" MouseLeftButtonUp="OnEventKeuze">
+                        <StackPanel HorizontalAlignment="Center">
+                            <TextBlock Text="🎉" FontSize="48" HorizontalAlignment="Center" Margin="0,0,0,16"/>
+                            <TextBlock Text="Evenement"
+                                       Foreground="{StaticResource WhiteBrush}"
+                                       FontSize="22" FontWeight="Bold"
+                                       HorizontalAlignment="Center"
+                                       Margin="0,0,0,10"/>
+                            <TextBlock Text="Plan een activiteit met datum, locatie en beschrijving."
+                                       Foreground="#AAAAAA"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
 
                 </StackPanel>
-            </ScrollViewer>
+            </StackPanel>
         </Grid>
     </Grid>
 </Page>
