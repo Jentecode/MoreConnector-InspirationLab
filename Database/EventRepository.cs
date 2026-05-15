@@ -7,7 +7,6 @@ namespace MoreConnector.Database
 {
     public static class EventRepository
     {
-        // ── Ophalen ───────────────────────────────────────────────────────────
         public static List<Event> GetAll(int huidigeUserId = 0)
         {
             var list = new List<Event>();
@@ -16,6 +15,7 @@ namespace MoreConnector.Database
             cmd.CommandText = @"
                 SELECT e.id, e.creator_id, e.title, e.description, e.location,
                        e.event_date, e.max_participants, e.created_at,
+                       COALESCE(e.image_path,'') AS image_path,
                        CONCAT(u.firstname,' ',u.lastname) AS creator_name,
                        COUNT(DISTINCT ep.id)              AS participant_count,
                        MAX(CASE WHEN ep.user_id=@uid THEN 1 ELSE 0 END) AS joined_by_me
@@ -37,6 +37,7 @@ namespace MoreConnector.Database
             cmd.CommandText = @"
                 SELECT e.id, e.creator_id, e.title, e.description, e.location,
                        e.event_date, e.max_participants, e.created_at,
+                       COALESCE(e.image_path,'') AS image_path,
                        CONCAT(u.firstname,' ',u.lastname) AS creator_name,
                        COUNT(DISTINCT ep.id) AS participant_count,
                        MAX(CASE WHEN ep.user_id=@uid THEN 1 ELSE 0 END) AS joined_by_me
@@ -55,15 +56,15 @@ namespace MoreConnector.Database
             return ev;
         }
 
-        // ── Aanmaken ──────────────────────────────────────────────────────────
         public static int Aanmaken(int creatorId, string title, string description,
-                                    string location, DateTime eventDate, int maxParticipants = 0)
+                                    string location, DateTime eventDate,
+                                    int maxParticipants = 0, string imagePath = "")
         {
             using var conn = DbConnection.GetConnection();
             using var cmd  = conn.CreateCommand();
             cmd.CommandText = @"
-                INSERT INTO events (creator_id, title, description, location, event_date, max_participants)
-                VALUES (@cid, @title, @desc, @loc, @date, @max);
+                INSERT INTO events (creator_id, title, description, location, event_date, max_participants, image_path)
+                VALUES (@cid, @title, @desc, @loc, @date, @max, @img);
                 SELECT LAST_INSERT_ID();";
             cmd.Parameters.AddWithValue("@cid",   creatorId);
             cmd.Parameters.AddWithValue("@title", title);
@@ -71,10 +72,31 @@ namespace MoreConnector.Database
             cmd.Parameters.AddWithValue("@loc",   location);
             cmd.Parameters.AddWithValue("@date",  eventDate);
             cmd.Parameters.AddWithValue("@max",   maxParticipants);
+            cmd.Parameters.AddWithValue("@img",   imagePath);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
 
-        // ── Verwijderen ───────────────────────────────────────────────────────
+        public static void Bijwerken(int eventId, string title, string description,
+                                      string location, DateTime eventDate,
+                                      int maxParticipants = 0, string imagePath = "")
+        {
+            using var conn = DbConnection.GetConnection();
+            using var cmd  = conn.CreateCommand();
+            cmd.CommandText = @"
+                UPDATE events
+                SET title=@title, description=@desc, location=@loc,
+                    event_date=@date, max_participants=@max, image_path=@img
+                WHERE id=@id";
+            cmd.Parameters.AddWithValue("@title", title);
+            cmd.Parameters.AddWithValue("@desc",  description);
+            cmd.Parameters.AddWithValue("@loc",   location);
+            cmd.Parameters.AddWithValue("@date",  eventDate);
+            cmd.Parameters.AddWithValue("@max",   maxParticipants);
+            cmd.Parameters.AddWithValue("@img",   imagePath);
+            cmd.Parameters.AddWithValue("@id",    eventId);
+            cmd.ExecuteNonQuery();
+        }
+
         public static void Verwijder(int eventId)
         {
             using var conn = DbConnection.GetConnection();
@@ -91,12 +113,9 @@ namespace MoreConnector.Database
             }
         }
 
-        // ── Deelnemen ─────────────────────────────────────────────────────────
         public static bool Inschrijven(int eventId, int userId)
         {
             using var conn = DbConnection.GetConnection();
-
-            // Al ingeschreven?
             using (var chk = conn.CreateCommand())
             {
                 chk.CommandText = "SELECT COUNT(*) FROM event_participants WHERE event_id=@eid AND user_id=@uid";
@@ -104,24 +123,15 @@ namespace MoreConnector.Database
                 chk.Parameters.AddWithValue("@uid", userId);
                 if (Convert.ToInt32(chk.ExecuteScalar()) > 0) return false;
             }
-
-            // Max bereikt?
             using (var mx = conn.CreateCommand())
             {
                 mx.CommandText = @"SELECT e.max_participants, COUNT(ep.id)
-                                   FROM events e
-                                   LEFT JOIN event_participants ep ON ep.event_id=e.id
+                                   FROM events e LEFT JOIN event_participants ep ON ep.event_id=e.id
                                    WHERE e.id=@eid GROUP BY e.id";
                 mx.Parameters.AddWithValue("@eid", eventId);
                 using var mr = mx.ExecuteReader();
-                if (mr.Read())
-                {
-                    int max   = mr.GetInt32(0);
-                    int count = mr.GetInt32(1);
-                    if (max > 0 && count >= max) return false;
-                }
+                if (mr.Read()) { int max = mr.GetInt32(0); int count = mr.GetInt32(1); if (max > 0 && count >= max) return false; }
             }
-
             using var ins = conn.CreateCommand();
             ins.CommandText = "INSERT INTO event_participants (event_id, user_id) VALUES (@eid, @uid)";
             ins.Parameters.AddWithValue("@eid", eventId);
@@ -140,7 +150,6 @@ namespace MoreConnector.Database
             cmd.ExecuteNonQuery();
         }
 
-        // ── Deelnemers namen ──────────────────────────────────────────────────
         public static List<string> GetDeelnemerNamen(int eventId, MySqlConnection? conn = null)
         {
             var list = new List<string>();
@@ -151,8 +160,7 @@ namespace MoreConnector.Database
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = @"
                     SELECT CONCAT(u.firstname,' ',u.lastname)
-                    FROM   event_participants ep
-                    JOIN   users u ON u.id = ep.user_id
+                    FROM   event_participants ep JOIN users u ON u.id = ep.user_id
                     WHERE  ep.event_id = @eid";
                 cmd.Parameters.AddWithValue("@eid", eventId);
                 using var r = cmd.ExecuteReader();
@@ -162,7 +170,6 @@ namespace MoreConnector.Database
             return list;
         }
 
-        // ── Mapper ────────────────────────────────────────────────────────────
         private static Event MapEvent(MySqlDataReader r) => new()
         {
             Id               = r.GetInt32("id"),
@@ -173,6 +180,7 @@ namespace MoreConnector.Database
             EventDate        = r.GetDateTime("event_date"),
             MaxParticipants  = r.IsDBNull(r.GetOrdinal("max_participants")) ? 0 : r.GetInt32("max_participants"),
             CreatedAt        = r.GetDateTime("created_at"),
+            ImagePath        = r.IsDBNull(r.GetOrdinal("image_path"))  ? "" : r.GetString("image_path"),
             CreatorName      = r.IsDBNull(r.GetOrdinal("creator_name")) ? "" : r.GetString("creator_name"),
             ParticipantCount = r.GetInt32("participant_count"),
             JoinedByMe       = r.GetInt32("joined_by_me") == 1
