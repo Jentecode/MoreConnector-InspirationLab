@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 namespace MoreConnector.Models
 {
-    /// <summary>Komt overeen met de `events` tabel.</summary>
     public class Event
     {
         public int      Id              { get; set; }
@@ -14,8 +13,8 @@ namespace MoreConnector.Models
         public DateTime EventDate       { get; set; }
         public int      MaxParticipants { get; set; }
         public DateTime CreatedAt       { get; set; }
+        public string   ImagePath       { get; set; } = "";  // FIX: afbeelding pad
 
-        // Ingevuld door JOIN/subquery
         public string       CreatorName       { get; set; } = "";
         public int          ParticipantCount  { get; set; }
         public bool         JoinedByMe        { get; set; }

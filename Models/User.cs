@@ -4,10 +4,6 @@ using System.ComponentModel;
 
 namespace MoreConnector.Models
 {
-    /// <summary>
-    /// Centrale gebruikersklasse — combineert DB-velden (Engels) met
-    /// UI-properties (Nederlands) zodat de rest van de app niet hoeft te veranderen.
-    /// </summary>
     public class User : INotifyPropertyChanged
     {
         // ── DB kolommen ──────────────────────────────────────────────────────
@@ -19,8 +15,9 @@ namespace MoreConnector.Models
         public string   Study     { get; set; } = "";
         public string   Bio       { get; set; } = "";
         public DateTime CreatedAt { get; set; }
+        public bool     IsAdmin   { get; set; }  // is_admin kolom in DB
 
-        // ── Nederlandse aliassen (gebruikt door views) ───────────────────────
+        // ── Nederlandse aliassen ─────────────────────────────────────────────
         public string Voornaam
         {
             get => Firstname;
@@ -37,7 +34,7 @@ namespace MoreConnector.Models
             set { Study = value; OnChanged(nameof(Studierichting)); }
         }
 
-        // ── Extra UI-velden (niet in DB, lokaal bijgehouden) ─────────────────
+        // ── Extra UI-velden ──────────────────────────────────────────────────
         private string _username = "";
         public string Username
         {
@@ -45,7 +42,13 @@ namespace MoreConnector.Models
             set { _username = value; OnChanged(nameof(Username)); OnChanged(nameof(DisplayNaam)); }
         }
 
-        public string Role            { get; set; } = "User";
+        private string _role = "User";
+        public string Role
+        {
+            get => _role;
+            set { _role = value; OnChanged(nameof(Role)); }
+        }
+
         public string ProfielFotoPad  { get; set; } = "";
         public string Telefoonnummer  { get; set; } = "";
         public string WachtwoordHash  { get; set; } = "";
