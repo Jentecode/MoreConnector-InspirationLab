@@ -1,3 +1,4 @@
+using MoreConnector.Database;
 using MoreConnector.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -11,7 +12,6 @@ namespace MoreConnector.Views
     public partial class ActivityPage : Page
     {
         private readonly AppState _state = AppState.Instance;
-        private ObservableCollection<Activiteit> _weergave = new();
 
         public ActivityPage()
         {
@@ -19,7 +19,11 @@ namespace MoreConnector.Views
             SidebarHelper.Init(this, SidebarHelper.ActivePage.Activiteiten);
             SearchBox.Text = "zoek activiteiten...";
 
-            // Gebruik code-behind kaarten i.p.v. ItemsControl voor klik + afbeelding
+            // FIX: Goedemiddag naam instellen
+            var user = _state.HuidigeGebruiker;
+            if (user != null && UsernameText != null)
+                UsernameText.Text = string.IsNullOrWhiteSpace(user.Username) ? user.Voornaam : user.Username;
+
             _state.Evenementen.CollectionChanged += (_, _) => HerlaadActiviteiten();
             HerlaadActiviteiten();
         }
@@ -41,8 +45,11 @@ namespace MoreConnector.Views
                     !ev.Beschrijving.ToLower().Contains(zoek))
                     continue;
 
-                bool kanVerwijderen = ev.Auteur == huidigeAuteur || _state.HuidigeGebruiker?.Role == "Admin";
-                PostPanel.Children.Add(BouwEvenementKaart(ev, kanVerwijderen));
+                // FIX: check via CreatorId (betrouwbaarder dan naam, werkt na logout/login)
+                int huidigeId = _state.HuidigeGebruiker?.Id ?? 0;
+                bool kanBeheren = (huidigeId > 0 && ev.CreatorId == huidigeId) ||
+                                  ev.Auteur == huidigeAuteur || _state.IsAdmin;
+                PostPanel.Children.Add(BouwEvenementKaart(ev, kanBeheren));
             }
 
             if (PostPanel.Children.Count == 0)
@@ -57,7 +64,7 @@ namespace MoreConnector.Views
             }
         }
 
-        private Border BouwEvenementKaart(AdminEvenement ev, bool kanVerwijderen)
+        private Border BouwEvenementKaart(AdminEvenement ev, bool kanBeheren)
         {
             var kaart = new Border
             {
@@ -65,64 +72,107 @@ namespace MoreConnector.Views
                 CornerRadius  = new CornerRadius(12),
                 Margin       = new Thickness(8),
                 MinHeight    = 200,
+                MaxWidth     = 320,
                 Cursor       = System.Windows.Input.Cursors.Hand
             };
 
-            // Klikken → detail pagina
             kaart.MouseLeftButtonUp += (_, _) =>
                 ((MoreConnector)Window.GetWindow(this)).AuthFrame.Navigate(new EvenementDetail(ev));
 
             var grid = new Grid();
-            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(1, GridUnitType.Star) });
+            grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(160) }); // vaste hoogte voor afbeelding
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
 
             // ── Afbeelding of placeholder ─────────────────────────────────
+            var imgBorder = new Border
+            {
+                CornerRadius = new CornerRadius(12, 12, 0, 0),
+                ClipToBounds = true
+            };
+
             if (!string.IsNullOrEmpty(ev.AfbeeldingPad))
             {
-                var bmp = ImageHelper.LaadGeschaald(ev.AfbeeldingPad, 600);
+                var bmp = ImageHelper.LaadGeschaald(ev.AfbeeldingPad, 640);
                 if (bmp != null)
                 {
-                    var img = new Image
+                    var img = new System.Windows.Controls.Image
                     {
                         Source  = bmp,
                         Stretch = Stretch.UniformToFill
                     };
-                    System.Windows.Media.RenderOptions.SetBitmapScalingMode(
-                        img, System.Windows.Media.BitmapScalingMode.HighQuality);
-                    Grid.SetRow(img, 0);
-                    grid.Children.Add(img);
+                    System.Windows.Media.RenderOptions.SetBitmapScalingMode(img, System.Windows.Media.BitmapScalingMode.HighQuality);
+                    imgBorder.Child = img;
                 }
-                else VoegPlaceholderToe(grid);
+                else
+                {
+                    imgBorder.Background = new SolidColorBrush(Color.FromRgb(45, 62, 80));
+                    imgBorder.Child = new TextBlock { Text = "🎉", FontSize = 36,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment = VerticalAlignment.Center,
+                        Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136)) };
+                }
             }
             else
             {
-                VoegPlaceholderToe(grid);
+                imgBorder.Background = new SolidColorBrush(Color.FromRgb(45, 62, 80));
+                imgBorder.Child = new TextBlock { Text = "🎉", FontSize = 36,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Foreground = new SolidColorBrush(Color.FromRgb(136, 136, 136)) };
             }
 
-            // ── Verwijder knop ────────────────────────────────────────────
-            if (kanVerwijderen)
+            Grid.SetRow(imgBorder, 0);
+            grid.Children.Add(imgBorder);
+
+            // ── Beheer knoppen (bewerken + verwijderen) ────────────────────
+            if (kanBeheren)
             {
+                var btnPanel = new StackPanel
+                {
+                    Orientation = Orientation.Horizontal,
+                    HorizontalAlignment = HorizontalAlignment.Right,
+                    VerticalAlignment = VerticalAlignment.Top,
+                    Margin = new Thickness(0, 8, 8, 0)
+                };
+
+                var editBtn = new Button
+                {
+                    Content = "✏", Background = new SolidColorBrush(Color.FromArgb(180, 30, 100, 200)),
+                    Foreground = new SolidColorBrush(Colors.White), BorderThickness = new Thickness(0),
+                    Width = 28, Height = 28, FontSize = 12,
+                    Cursor = System.Windows.Input.Cursors.Hand, Margin = new Thickness(0, 0, 4, 0),
+                    ToolTip = "Activiteit bewerken"
+                };
+                editBtn.Click += (_, args) =>
+                {
+                    args.Handled = true;
+                    Nav().AuthFrame.Navigate(new BewerkActiviteitPage(ev));
+                };
+                btnPanel.Children.Add(editBtn);
+
                 var del = new Button
                 {
-                    Content         = "✕",
-                    Background      = new SolidColorBrush(Color.FromArgb(180, 0, 0, 0)),
-                    Foreground      = new SolidColorBrush(Colors.White),
-                    BorderThickness = new Thickness(0),
-                    Width           = 28, Height = 28,
-                    FontSize        = 12,
-                    HorizontalAlignment = HorizontalAlignment.Right,
-                    VerticalAlignment   = VerticalAlignment.Top,
-                    Margin          = new Thickness(0, 8, 8, 0),
-                    Cursor          = System.Windows.Input.Cursors.Hand,
-                    Tag             = ev
+                    Content = "✕", Background = new SolidColorBrush(Color.FromArgb(180, 0, 0, 0)),
+                    Foreground = new SolidColorBrush(Colors.White), BorderThickness = new Thickness(0),
+                    Width = 28, Height = 28, FontSize = 12,
+                    Cursor = System.Windows.Input.Cursors.Hand,
+                    ToolTip = "Activiteit verwijderen"
                 };
                 del.Click += (_, args) =>
                 {
-                    args.Handled = true; // voorkom navigatie
-                    _state.Evenementen.Remove(ev);
+                    args.Handled = true;
+                    var r = MessageBox.Show($"Activiteit '{ev.Naam}' verwijderen?", "Bevestig",
+                        MessageBoxButton.YesNo, MessageBoxImage.Question);
+                    if (r == MessageBoxResult.Yes)
+                    {
+                        try { EventRepository.Verwijder(ev.Id); } catch { }
+                        _state.Evenementen.Remove(ev);
+                    }
                 };
-                Grid.SetRow(del, 0);
-                grid.Children.Add(del);
+                btnPanel.Children.Add(del);
+
+                Grid.SetRow(btnPanel, 0);
+                grid.Children.Add(btnPanel);
             }
 
             // ── Info balk ─────────────────────────────────────────────────
@@ -135,17 +185,21 @@ namespace MoreConnector.Views
             var infoStack = new StackPanel();
             infoStack.Children.Add(new TextBlock
             {
-                Text       = ev.Naam,
-                Foreground = new SolidColorBrush(Colors.White),
-                FontSize   = 13, FontWeight = FontWeights.SemiBold,
-                TextWrapping = TextWrapping.Wrap
+                Text = ev.Naam, Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 13, FontWeight = FontWeights.SemiBold, TextWrapping = TextWrapping.Wrap
             });
             infoStack.Children.Add(new TextBlock
             {
-                Text       = $"{ev.Locatie}  ·  {ev.DatumTekst}",
-                Foreground = new SolidColorBrush(Colors.White),
-                FontSize   = 12, TextWrapping = TextWrapping.Wrap
+                Text = $"{ev.Locatie}  ·  {ev.DatumTekst}", Foreground = new SolidColorBrush(Colors.White),
+                FontSize = 12, TextWrapping = TextWrapping.Wrap
             });
+            if (ev.MaxDeelnemers > 0)
+                infoStack.Children.Add(new TextBlock
+                {
+                    Text = $"Max. {ev.MaxDeelnemers} deelnemers",
+                    Foreground = new SolidColorBrush(Color.FromRgb(255, 220, 180)),
+                    FontSize = 11
+                });
             infoBalk.Child = infoStack;
             Grid.SetRow(infoBalk, 1);
             grid.Children.Add(infoBalk);
@@ -154,45 +208,22 @@ namespace MoreConnector.Views
             return kaart;
         }
 
-        private void VoegPlaceholderToe(Grid grid)
-        {
-            var ph = new TextBlock
-            {
-                Text                = "🎉",
-                FontSize            = 36,
-                HorizontalAlignment = HorizontalAlignment.Center,
-                VerticalAlignment   = VerticalAlignment.Center,
-                Foreground          = new SolidColorBrush(Color.FromRgb(136, 136, 136))
-            };
-            Grid.SetRow(ph, 0);
-            grid.Children.Add(ph);
-        }
-
         private void OnBekijkAllesClick(object sender, RoutedEventArgs e) { }
 
         private void SearchBox_GotFocus(object sender, RoutedEventArgs e)
         {
             if (SearchBox.Text == "zoek activiteiten...") SearchBox.Text = "";
         }
-
         private void SearchBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (string.IsNullOrWhiteSpace(SearchBox.Text)) SearchBox.Text = "zoek activiteiten...";
         }
-
         private void SearchBox_TextChanged(object sender, TextChangedEventArgs e) => HerlaadActiviteiten();
 
-
         private void OnHomeClick(object sender, RoutedEventArgs e)         => Nav().AuthFrame.Navigate(new Feed());
-
         private void OnBerichtenClick(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void OnAanmakenClick(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void OnProfielClick(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
-
-        
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());
@@ -212,8 +243,6 @@ namespace MoreConnector.Views
             }
         }
         private void OnProfielAvatarClick(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new ProfilePage());
-
         private MoreConnector Nav() => (MoreConnector)Window.GetWindow(this);
-
     }
 }

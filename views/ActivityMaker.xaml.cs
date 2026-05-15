@@ -1,4 +1,5 @@
 using MoreConnector.Models;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,21 +19,37 @@ namespace MoreConnector.Views
         {
             string naam        = NaamInput.Text.Trim();
             string categorie   = CategorieInput.Text.Trim();
-            string datumTijd   = DatumTijdInput.Text.Trim();
             string locatie     = LocatieInput.Text.Trim();
             string beschrijving = BeschrijvingInput.Text.Trim();
+            string tijdText    = DatumTijdInput.Text.Trim(); // HH:mm
 
-            if (string.IsNullOrEmpty(naam) || string.IsNullOrEmpty(locatie) || string.IsNullOrEmpty(datumTijd))
+            if (string.IsNullOrEmpty(naam) || string.IsNullOrEmpty(locatie))
             {
-                MessageBox.Show("Vul minstens een naam, locatie en datum & tijd in.", "Validatie");
+                MessageBox.Show("Vul minstens een naam en locatie in.", "Validatie");
                 return;
             }
+
+            if (DatumPicker.SelectedDate == null)
+            {
+                MessageBox.Show("Kies een datum via de kalender.", "Validatie");
+                return;
+            }
+
+            // Combineer datum en tijdstip
+            DateTime datum = DatumPicker.SelectedDate.Value.Date;
+            if (TimeSpan.TryParseExact(tijdText, @"hh\:mm", null, out var ts))
+                datum = datum.Add(ts);
+            else if (TimeSpan.TryParseExact(tijdText, @"h\:mm", null, out var ts2))
+                datum = datum.Add(ts2);
+
+            int maxDeelnemers = 0;
+            int.TryParse(MaxDeelnemersInput.Text.Trim(), out maxDeelnemers);
 
             string auteur = _state.HuidigeGebruiker?.DisplayNaam ?? "Onbekend";
             string tagStr = _tags.Count > 0 ? " · " + string.Join(" ", _tags.ConvertAll(t => $"#{t}")) : "";
 
-            // ── Evenement gaat naar Activiteiten-pagina (en Admin), NIET naar Feed ──
-            _state.VoegEvenementToe(naam, locatie, datumTijd, beschrijving + tagStr, auteur, _afbeeldingPad);
+            _state.VoegEvenementToe(naam, locatie, datum.ToString("yyyy-MM-dd HH:mm"),
+                                    beschrijving + tagStr, auteur, _afbeeldingPad, maxDeelnemers);
 
             Nav().AuthFrame.Navigate(new ActivityPage());
         }
@@ -47,7 +64,7 @@ namespace MoreConnector.Views
             {
                 _afbeeldingPad = dialog.FileName;
                 AfbeeldingButton.Content = $"✓ {System.IO.Path.GetFileName(dialog.FileName)}";
-                var bmp = ImageHelper.LaadGeschaald(_afbeeldingPad, 160);
+                var bmp = ImageHelper.LaadGeschaald(_afbeeldingPad, 300);
                 if (bmp != null)
                 {
                     AfbeeldingPreview.Source = bmp;
@@ -79,7 +96,7 @@ namespace MoreConnector.Views
             });
             var verwijder = new Button
             {
-                Content = " ×", Background = Brushes.Transparent,
+                Content = " ×", Background = System.Windows.Media.Brushes.Transparent,
                 BorderThickness = new Thickness(0), Foreground = new SolidColorBrush(Colors.White),
                 FontSize = 14, Cursor = System.Windows.Input.Cursors.Hand, Tag = tag
             };
@@ -90,14 +107,12 @@ namespace MoreConnector.Views
         }
 
         private void OnAnnulerenClick(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new AanmakenKeuze());
-
         private void OnHomeClick(object sender, RoutedEventArgs e)         => Nav().AuthFrame.Navigate(new Feed());
-
         private void OnBerichtenClick(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void OnAanmakenClick(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void OnProfielClick(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
 
-        private void OnBeschrijvingChanged(object sender, System.Windows.Controls.TextChangedEventArgs e)
+        private void OnBeschrijvingChanged(object sender, TextChangedEventArgs e)
         {
             int len = BeschrijvingInput.Text.Length;
             BeschrijvingTeller.Text = $"{len} / 300";
@@ -105,9 +120,6 @@ namespace MoreConnector.Views
                 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Tomato)
                 : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(170,170,170));
         }
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());
@@ -127,7 +139,6 @@ namespace MoreConnector.Views
             }
         }
         private void OnProfielAvatarClick(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new ProfilePage());
-
         private MoreConnector Nav() => (MoreConnector)Window.GetWindow(this);
     }
 }

@@ -279,6 +279,29 @@
                              Style="{StaticResource InputStyle}"
                              Margin="0,0,0,24"/>
 
+
+                    <!-- Wachtwoord wijzigen -->
+                    <TextBlock Text="Wachtwoord wijzigen"
+                               Foreground="White" FontSize="15" FontWeight="SemiBold"
+                               Margin="0,24,0,12"/>
+                    <TextBlock Text="Huidig wachtwoord" Style="{StaticResource LabelStyle}"/>
+                    <PasswordBox x:Name="TxtHuidigWachtwoord"
+                                 Padding="10,8" FontSize="13" Margin="0,0,0,10"
+                                 Background="#1E2E40" Foreground="White" BorderThickness="0"/>
+                    <TextBlock Text="Nieuw wachtwoord" Style="{StaticResource LabelStyle}"/>
+                    <PasswordBox x:Name="TxtNieuwWachtwoord"
+                                 Padding="10,8" FontSize="13" Margin="0,0,0,10"
+                                 Background="#1E2E40" Foreground="White" BorderThickness="0"/>
+                    <TextBlock Text="Bevestig nieuw wachtwoord" Style="{StaticResource LabelStyle}"/>
+                    <PasswordBox x:Name="TxtBevestigWachtwoord"
+                                 Padding="10,8" FontSize="13" Margin="0,0,0,10"
+                                 Background="#1E2E40" Foreground="White" BorderThickness="0"/>
+                    <Button Content="Wachtwoord wijzigen"
+                            Style="{StaticResource OrangeButtonStyle}"
+                            HorizontalAlignment="Left"
+                            Margin="0,0,0,16"
+                            Click="OnWachtwoordWijzigenClick"/>
+
                     <Button Content="Opslaan"
                             Style="{StaticResource OrangeButtonStyle}"
                             HorizontalAlignment="Left"

@@ -15,99 +15,68 @@ namespace MoreConnector
 
         private void TxtVoornaam_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtVoornaam.Text == "Voornaam")
-            {
-                TxtVoornaam.Text = "";
-                TxtVoornaam.Foreground = Brushes.Black;
-            }
+            if (TxtVoornaam.Text == "Voornaam") { TxtVoornaam.Text = ""; TxtVoornaam.Foreground = Brushes.Black; }
         }
-
         private void TxtVoornaam_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtVoornaam.Text))
-            {
-                TxtVoornaam.Text = "Voornaam";
-                TxtVoornaam.Foreground = Brushes.Gray;
-            }
+            if (string.IsNullOrWhiteSpace(TxtVoornaam.Text)) { TxtVoornaam.Text = "Voornaam"; TxtVoornaam.Foreground = Brushes.Gray; }
         }
 
         private void TxtAchternaam_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtAchternaam.Text == "Achternaam")
-            {
-                TxtAchternaam.Text = "";
-                TxtAchternaam.Foreground = Brushes.Black;
-            }
+            if (TxtAchternaam.Text == "Achternaam") { TxtAchternaam.Text = ""; TxtAchternaam.Foreground = Brushes.Black; }
         }
-
         private void TxtAchternaam_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtAchternaam.Text))
-            {
-                TxtAchternaam.Text = "Achternaam";
-                TxtAchternaam.Foreground = Brushes.Gray;
-            }
+            if (string.IsNullOrWhiteSpace(TxtAchternaam.Text)) { TxtAchternaam.Text = "Achternaam"; TxtAchternaam.Foreground = Brushes.Gray; }
+        }
+
+        private void TxtNickname_GotFocus(object sender, RoutedEventArgs e)
+        {
+            if (TxtNickname.Text == "Nickname / gebruikersnaam") { TxtNickname.Text = ""; TxtNickname.Foreground = Brushes.Black; }
+        }
+        private void TxtNickname_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(TxtNickname.Text)) { TxtNickname.Text = "Nickname / gebruikersnaam"; TxtNickname.Foreground = Brushes.Gray; }
         }
 
         private void TxtEmail_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtEmail.Text == "email-adres")
-            {
-                TxtEmail.Text = "";
-                TxtEmail.Foreground = Brushes.Black;
-            }
+            if (TxtEmail.Text == "email-adres") { TxtEmail.Text = ""; TxtEmail.Foreground = Brushes.Black; }
         }
-
         private void TxtEmail_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtEmail.Text))
-            {
-                TxtEmail.Text = "email-adres";
-                TxtEmail.Foreground = Brushes.Gray;
-            }
+            if (string.IsNullOrWhiteSpace(TxtEmail.Text)) { TxtEmail.Text = "email-adres"; TxtEmail.Foreground = Brushes.Gray; }
         }
 
         private void TxtTelefoon_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtTelefoon.Text == "telefoonnummer")
-            {
-                TxtTelefoon.Text = "";
-                TxtTelefoon.Foreground = Brushes.Black;
-            }
+            if (TxtTelefoon.Text == "telefoonnummer") { TxtTelefoon.Text = ""; TxtTelefoon.Foreground = Brushes.Black; }
         }
-
         private void TxtTelefoon_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtTelefoon.Text))
-            {
-                TxtTelefoon.Text = "telefoonnummer";
-                TxtTelefoon.Foreground = Brushes.Gray;
-            }
+            if (string.IsNullOrWhiteSpace(TxtTelefoon.Text)) { TxtTelefoon.Text = "telefoonnummer"; TxtTelefoon.Foreground = Brushes.Gray; }
         }
 
         private void TxtStudierichting_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtStudierichting.Text == "studierichting")
-            {
-                TxtStudierichting.Text = "";
-                TxtStudierichting.Foreground = Brushes.Black;
-            }
+            if (TxtStudierichting.Text == "studierichting") { TxtStudierichting.Text = ""; TxtStudierichting.Foreground = Brushes.Black; }
         }
-
         private void TxtStudierichting_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtStudierichting.Text))
-            {
-                TxtStudierichting.Text = "studierichting";
-                TxtStudierichting.Foreground = Brushes.Gray;
-            }
+            if (string.IsNullOrWhiteSpace(TxtStudierichting.Text)) { TxtStudierichting.Text = "studierichting"; TxtStudierichting.Foreground = Brushes.Gray; }
         }
+
+        private void BtnTerug_Click(object sender, RoutedEventArgs e)
+            => ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
 
         private void BtnCreate_Click(object sender, RoutedEventArgs e)
         {
             string voornaam = TxtVoornaam.Text.Trim();
             string achternaam = TxtAchternaam.Text.Trim();
             string email = TxtEmail.Text.Trim();
+            string nickname = TxtNickname.Text.Trim();
+            if (nickname == "Nickname / gebruikersnaam") nickname = "";
 
             if (string.IsNullOrWhiteSpace(voornaam) || voornaam == "Voornaam" ||
                 string.IsNullOrWhiteSpace(achternaam) || achternaam == "Achternaam")
@@ -134,12 +103,17 @@ namespace MoreConnector
             try
             {
                 string studierichting = TxtStudierichting.Text.Trim();
-                if (studierichting == "Studierichting") studierichting = "";
+                if (studierichting == "studierichting") studierichting = "";
+
+                // Gebruik email-prefix als nickname als niet opgegeven
+                string gebruikersnaam = string.IsNullOrWhiteSpace(nickname)
+                    ? email.Split('@')[0]
+                    : nickname;
 
                 int newId = UserRepository.Registreer(
                     voornaam, achternaam, email,
                     TxtWachtwoord.Password,
-                    studierichting);
+                    studierichting, "", gebruikersnaam);
 
                 MessageBox.Show("Account aangemaakt! Je kunt nu inloggen.", "Succes",
                     MessageBoxButton.OK, MessageBoxImage.Information);
@@ -155,11 +129,8 @@ namespace MoreConnector
         private void TxtWachtwoord_PasswordChanged(object sender, RoutedEventArgs e)
         {
             if (WachtwoordPlaceholder != null)
-            {
                 WachtwoordPlaceholder.Visibility = TxtWachtwoord.Password.Length > 0
-                    ? Visibility.Collapsed
-                    : Visibility.Visible;
-            }
+                    ? Visibility.Collapsed : Visibility.Visible;
         }
     }
 }

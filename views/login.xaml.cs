@@ -45,23 +45,6 @@ namespace MoreConnector
                 return;
             }
 
-            // ── ADMIN (hardcoded) ────────────────────────────────────────────
-            if (invoer == "admin" && password == "admin")
-            {
-                state.HuidigeGebruiker = new User
-                {
-                    Id        = 0,
-                    Firstname = "Admin",
-                    Lastname  = "User",
-                    Username  = "admin",
-                    Email     = "admin@admin",
-                    Role      = "Admin"
-                };
-                state.LaadAlles();
-                main.NavigateToAdmin();
-                return;
-            }
-
             // ── DB LOGIN ─────────────────────────────────────────────────────
             try
             {
@@ -72,11 +55,22 @@ namespace MoreConnector
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-                // Zet username op deel voor @ van email
-                user.Username = invoer.Contains("@") ? invoer.Split('@')[0] : invoer;
+                // Username instellen (niet gedwongen vanuit email)
+                if (string.IsNullOrWhiteSpace(user.Username))
+                    user.Username = invoer.Contains("@") ? invoer.Split('@')[0] : invoer;
                 state.HuidigeGebruiker = user;
                 state.LaadAlles();
-                main.NavigateToFeed();
+
+                // Admin check via is_admin veld
+                if (user.IsAdmin)
+                {
+                    user.Role = "Admin";
+                    main.NavigateToFeed(); // admins gaan ook naar feed, maar zien Beheer knop
+                }
+                else
+                {
+                    main.NavigateToFeed();
+                }
             }
             catch (System.Exception ex)
             {

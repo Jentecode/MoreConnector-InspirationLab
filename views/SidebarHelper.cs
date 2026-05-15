@@ -25,10 +25,12 @@ namespace MoreConnector.Views
             SetText(page, "SideNaamLabel",
                 user == null ? "Profiel" :
                 string.IsNullOrWhiteSpace(user.Username) ? user.VolledigeNaam : $"@{user.Username}");
-            SetText(page, "SideRolLabel", user?.Role == "Admin" ? "Admin" : "");
 
-            SetVisibility(page, "BtnAdmin",
-                user?.Role == "Admin" ? Visibility.Visible : Visibility.Collapsed);
+
+            // FIX: check both IsAdmin flag and Role string
+            bool isAdmin = user?.IsAdmin == true || user?.Role == "Admin";
+            SetVisibility(page, "BtnAdmin", isAdmin ? Visibility.Visible : Visibility.Collapsed);
+            SetText(page, "SideRolLabel", isAdmin ? "Admin" : "");
 
             // Profielfoto
             var bmp = ImageHelper.LaadGeschaald(user?.ProfielFotoPad ?? "", 64);
@@ -41,7 +43,7 @@ namespace MoreConnector.Views
             }
 
             // Actieve knop
-            string[] btns = { "BtnHome", "BtnActiviteiten", "BtnBerichten", "BtnAanmaken", "BtnProfiel", "BtnAdmin" };
+            string[] btns = { "BtnHome", "BtnActiviteiten", "BtnBerichten", "BtnGebruikers", "BtnNotificaties", "BtnAanmaken", "BtnProfiel", "BtnAdmin" };
             string activeBtn = active switch
             {
                 ActivePage.Home         => "BtnHome",

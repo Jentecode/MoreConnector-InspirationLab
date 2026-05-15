@@ -12,19 +12,19 @@ namespace MoreConnector.Views
         private readonly AppState _state = AppState.Instance;
         private readonly ObservableCollection<AdminPost>      _gefilterdePosts      = new();
         private readonly ObservableCollection<AdminEvenement> _gefilterdeEvents     = new();
-        private readonly ObservableCollection<User> _gefilterdeGebruikers = new();
-        private readonly ObservableCollection<AdminComment> _gefilterdeComments = new();
+        private readonly ObservableCollection<User>           _gefilterdeGebruikers = new();
+        private readonly ObservableCollection<AdminComment>   _gefilterdeComments   = new();
 
         public AdminPage()
         {
             InitializeComponent();
 
-            PostsList.ItemsSource  = _gefilterdePosts;
-            EventsList.ItemsSource = _gefilterdeEvents;
-            UsersList.ItemsSource  = _gefilterdeGebruikers;
+            PostsList.ItemsSource    = _gefilterdePosts;
+            EventsList.ItemsSource   = _gefilterdeEvents;
+            UsersList.ItemsSource    = _gefilterdeGebruikers;
             CommentsList.ItemsSource = _gefilterdeComments;
 
-            _state.Berichten.CollectionChanged  += (_, _) => HerlaadPosts();
+            _state.Berichten.CollectionChanged   += (_, _) => HerlaadPosts();
             _state.Evenementen.CollectionChanged += (_, _) => HerlaadEvents();
             _state.Gebruikers.CollectionChanged  += (_, _) => HerlaadGebruikers();
 
@@ -48,36 +48,39 @@ namespace MoreConnector.Views
             actief.Style = active;
         }
 
+        private void HideAllPanels()
+        {
+            PostsPanel.Visibility    = Visibility.Collapsed;
+            EventsPanel.Visibility   = Visibility.Collapsed;
+            UsersPanel.Visibility    = Visibility.Collapsed;
+            if (CommentsPanel != null) CommentsPanel.Visibility = Visibility.Collapsed;
+        }
+
         private void OnTabPosts(object sender, RoutedEventArgs e)
         {
-            PostsPanel.Visibility  = Visibility.Visible;
-            EventsPanel.Visibility = Visibility.Collapsed;
-            UsersPanel.Visibility  = Visibility.Collapsed;
+            HideAllPanels();
+            PostsPanel.Visibility = Visibility.Visible;
             SetActiveTab(TabPostsBtn);
         }
 
         private void OnTabEvents(object sender, RoutedEventArgs e)
         {
-            PostsPanel.Visibility  = Visibility.Collapsed;
+            HideAllPanels();
             EventsPanel.Visibility = Visibility.Visible;
-            UsersPanel.Visibility  = Visibility.Collapsed;
             SetActiveTab(TabEventsBtn);
         }
 
         private void OnTabComments(object sender, RoutedEventArgs e)
         {
-            PostsPanel.Visibility    = Visibility.Collapsed;
-            EventsPanel.Visibility   = Visibility.Collapsed;
-            UsersPanel.Visibility    = Visibility.Collapsed;
-            CommentsPanel.Visibility = Visibility.Visible;
+            HideAllPanels();
+            if (CommentsPanel != null) CommentsPanel.Visibility = Visibility.Visible;
             SetActiveTab(TabCommentsBtn);
         }
 
         private void OnTabUsers(object sender, RoutedEventArgs e)
         {
-            PostsPanel.Visibility  = Visibility.Collapsed;
-            EventsPanel.Visibility = Visibility.Collapsed;
-            UsersPanel.Visibility  = Visibility.Visible;
+            HideAllPanels();
+            UsersPanel.Visibility = Visibility.Visible;
             SetActiveTab(TabUsersBtn);
         }
 
@@ -120,25 +123,41 @@ namespace MoreConnector.Views
         private void EventsSearchBox_TextChanged(object sender, TextChangedEventArgs e) => HerlaadEvents();
         private void UsersSearchBox_TextChanged(object sender, TextChangedEventArgs e)  => HerlaadGebruikers();
 
-        // ── Verwijderen ──────────────────────────────────────────────────────
+        // ── Verwijderen — ook echt uit DB ────────────────────────────────────
         private void OnPostVerwijderenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not AdminPost post) return;
+            var res = MessageBox.Show($"Post van '{post.Auteur}' verwijderen?", "Bevestig",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) return;
+
+            // Verwijder uit DB
+            try { PostRepository.Verwijder(post.Id); } catch { }
+
             _state.Berichten.Remove(post);
-            var fp = _state.FeedPosts.FirstOrDefault(f =>
-                f.Beschrijving == post.Beschrijving && f.AuteurNaam == post.Auteur);
+            var fp = _state.FeedPosts.FirstOrDefault(f => f.DbId == post.Id);
             if (fp != null) _state.FeedPosts.Remove(fp);
         }
 
         private void OnEventVerwijderenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not AdminEvenement ev) return;
+            var res = MessageBox.Show($"Activiteit '{ev.Naam}' verwijderen?", "Bevestig",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) return;
+
+            try { EventRepository.Verwijder(ev.Id); } catch { }
             _state.Evenementen.Remove(ev);
         }
 
         private void OnGebruikerVerwijderenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not User user) return;
+            var res = MessageBox.Show($"Gebruiker '{user.VolledigeNaam}' verwijderen?", "Bevestig",
+                MessageBoxButton.YesNo, MessageBoxImage.Warning);
+            if (res != MessageBoxResult.Yes) return;
+
+            try { UserRepository.Verwijder(user.Id); } catch { }
             _state.Gebruikers.Remove(user);
         }
 
@@ -155,7 +174,7 @@ namespace MoreConnector.Views
             user.IsBanned = false;
         }
 
-        // ── Wachtwoord wijzigen ───────────────────────────────────────────────
+        // ── Wachtwoord wijzigen — grotere opslaan knop ───────────────────────
         private void OnWachtwoordWijzigenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not User user) return;
@@ -163,7 +182,7 @@ namespace MoreConnector.Views
             var win = new Window
             {
                 Title = $"Wachtwoord — {user.DisplayNaam}",
-                Width = 380, Height = 230,
+                Width = 420, Height = 280,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this),
                 ResizeMode = ResizeMode.NoResize,
@@ -171,33 +190,37 @@ namespace MoreConnector.Views
                     System.Windows.Media.Color.FromRgb(27, 42, 59))
             };
 
-            var sp = new StackPanel { Margin = new Thickness(24) };
+            var sp = new StackPanel { Margin = new Thickness(28) };
             sp.Children.Add(new TextBlock
             {
                 Text = $"Nieuw wachtwoord voor {user.DisplayNaam}",
                 Foreground = System.Windows.Media.Brushes.White,
-                FontSize = 14, FontWeight = FontWeights.SemiBold,
-                Margin = new Thickness(0, 0, 0, 12)
+                FontSize = 15, FontWeight = FontWeights.SemiBold,
+                Margin = new Thickness(0, 0, 0, 16)
             });
 
-            var pw1 = new PasswordBox { Padding = new Thickness(10, 8, 10, 8), FontSize = 14, Margin = new Thickness(0, 0, 0, 8) };
+            var pw1 = new PasswordBox { Padding = new Thickness(10, 10, 10, 10), FontSize = 14, Margin = new Thickness(0, 0, 0, 10) };
             sp.Children.Add(new TextBlock { Text = "Nieuw wachtwoord", Foreground = System.Windows.Media.Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 0, 0, 4) });
             sp.Children.Add(pw1);
 
-            var pw2 = new PasswordBox { Padding = new Thickness(10, 8, 10, 8), FontSize = 14, Margin = new Thickness(0, 0, 0, 12) };
+            var pw2 = new PasswordBox { Padding = new Thickness(10, 10, 10, 10), FontSize = 14, Margin = new Thickness(0, 0, 0, 14) };
             sp.Children.Add(new TextBlock { Text = "Bevestig wachtwoord", Foreground = System.Windows.Media.Brushes.Gray, FontSize = 12, Margin = new Thickness(0, 0, 0, 4) });
             sp.Children.Add(pw2);
 
-            var fout = new TextBlock { Foreground = System.Windows.Media.Brushes.Tomato, FontSize = 12, Visibility = Visibility.Collapsed };
+            var fout = new TextBlock { Foreground = System.Windows.Media.Brushes.Tomato, FontSize = 12, Visibility = Visibility.Collapsed, Margin = new Thickness(0, 0, 0, 8) };
             sp.Children.Add(fout);
 
             var opslaanBtn = new Button
             {
-                Content = "Opslaan", Padding = new Thickness(16, 8, 16, 8),
+                Content = "💾  Wachtwoord opslaan",
+                Padding = new Thickness(20, 14, 20, 14),
                 Background = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 0)),
-                Foreground = System.Windows.Media.Brushes.White, BorderThickness = new Thickness(0),
-                Cursor = System.Windows.Input.Cursors.Hand, Margin = new Thickness(0, 8, 0, 0),
-                HorizontalAlignment = HorizontalAlignment.Left
+                Foreground = System.Windows.Media.Brushes.White,
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                FontSize = 15, FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Stretch,
+                Height = 52
             };
             opslaanBtn.Click += (_, _) =>
             {
@@ -229,14 +252,13 @@ namespace MoreConnector.Views
             }
         }
 
-        // ── Lege staten ──────────────────────────────────────────────────────
+        // ── Comments ──────────────────────────────────────────────────────────
         private void HerlaadComments()
         {
             string zoek = CommentsSearchBox?.Text?.ToLower() ?? "";
             _gefilterdeComments.Clear();
             try
             {
-                // Haal alle comments op via alle posts
                 var posts = PostRepository.GetAll();
                 foreach (var p in posts)
                 {
@@ -276,10 +298,10 @@ namespace MoreConnector.Views
 
         private void RefreshLeegStaten()
         {
-            if (PostsLeegTekst    != null) PostsLeegTekst.Visibility    = _gefilterdePosts.Count     == 0 ? Visibility.Visible : Visibility.Collapsed;
-            if (EventsLeegTekst  != null) EventsLeegTekst.Visibility  = _gefilterdeEvents.Count    == 0 ? Visibility.Visible : Visibility.Collapsed;
-            if (UsersLeegTekst   != null) UsersLeegTekst.Visibility   = _gefilterdeGebruikers.Count== 0 ? Visibility.Visible : Visibility.Collapsed;
-            if (CommentsLeegTekst!= null) CommentsLeegTekst.Visibility = _gefilterdeComments.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (PostsLeegTekst    != null) PostsLeegTekst.Visibility    = _gefilterdePosts.Count      == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (EventsLeegTekst   != null) EventsLeegTekst.Visibility   = _gefilterdeEvents.Count     == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (UsersLeegTekst    != null) UsersLeegTekst.Visibility    = _gefilterdeGebruikers.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+            if (CommentsLeegTekst != null) CommentsLeegTekst.Visibility  = _gefilterdeComments.Count  == 0 ? Visibility.Visible : Visibility.Collapsed;
         }
     }
 

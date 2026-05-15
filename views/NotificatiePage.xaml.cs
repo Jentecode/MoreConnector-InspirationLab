@@ -16,7 +16,7 @@ namespace MoreConnector.Views
         public NotificatiePage()
         {
             InitializeComponent();
-            SidebarHelper.Init(this, SidebarHelper.ActivePage.Geen);
+            SidebarHelper.Init(this, SidebarHelper.ActivePage.Notificaties);
             LaadVerzoeken();
         }
 

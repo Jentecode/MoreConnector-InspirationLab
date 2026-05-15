@@ -158,6 +158,19 @@
                 <StackPanel Grid.Row="2">
                     <TextBlock Text="Posts" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
                     <StackPanel x:Name="PostsPanel"/>
+
+                    <!-- Activiteiten -->
+                    <TextBlock Text="Activiteiten"
+                               Foreground="White" FontSize="15" FontWeight="SemiBold"
+                               Margin="0,20,0,12"/>
+                    <StackPanel x:Name="ActiviteitenPanel"/>
+
+                    <!-- Connecties -->
+                    <TextBlock Text="Connecties"
+                               Foreground="White" FontSize="15" FontWeight="SemiBold"
+                               Margin="0,20,0,12"/>
+                    <StackPanel x:Name="ConnectiesPanel"/>
+
                 </StackPanel>
             </Grid>
         </ScrollViewer>

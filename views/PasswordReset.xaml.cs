@@ -29,6 +29,9 @@ namespace MoreConnector
             }
         }
 
+        private void BtnTerug_Click(object sender, RoutedEventArgs e)
+            => ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
+
         private void BtnSend_Click(object sender, RoutedEventArgs e)
         {
             string email = TxtEmail.Text.Trim();

@@ -14,11 +14,13 @@ namespace MoreConnector.Views
     {
         private readonly AppState _state = AppState.Instance;
         private List<User> _alleGebruikers = new();
+        // FIX: bijhouden welke requests lokaal verstuurd zijn (reset niet bij tab-switch)
+        private readonly System.Collections.Generic.HashSet<int> _verzondenRequests = new();
 
         public GebruikersPage()
         {
             InitializeComponent();
-            SidebarHelper.Init(this, SidebarHelper.ActivePage.Geen);
+            SidebarHelper.Init(this, SidebarHelper.ActivePage.Gebruikers);
             ZoekBox.Text = "Zoek op naam of gebruikersnaam...";
             ZoekBox.Foreground = new SolidColorBrush(Colors.Gray);
             LaadGebruikers();
@@ -131,6 +133,10 @@ namespace MoreConnector.Views
             // Vriendknop
             if (eigenId > 0)
             {
+                // FIX: check ook de lokale cache zodat de knop niet reset bij tab-switch
+                if (status == "none" && _verzondenRequests.Contains(user.Id))
+                    status = "pending";
+
                 Button? vriendenBtn = null;
                 switch (status)
                 {
@@ -140,6 +146,7 @@ namespace MoreConnector.Views
                         {
                             try { FriendshipRepository.StuurVerzoek(eigenId, user.Id); }
                             catch { }
+                            _verzondenRequests.Add(user.Id);  // FIX: bewaar in locale cache
                             vriendenBtn.Content = "✓ Verzonden";
                             vriendenBtn.IsEnabled = false;
                             vriendenBtn.Background = new SolidColorBrush(Color.FromRgb(80, 80, 80));

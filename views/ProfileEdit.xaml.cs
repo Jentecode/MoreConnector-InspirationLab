@@ -20,7 +20,6 @@ namespace MoreConnector.Views
             LaadHuidigeData();
         }
 
-        // ── Laad huidige data ────────────────────────────────────────────────
         private void LaadHuidigeData()
         {
             var user = _state.HuidigeGebruiker;
@@ -32,12 +31,11 @@ namespace MoreConnector.Views
             TelefoonnummerInput.Text = user.Telefoonnummer;
             StudierichtingInput.Text = user.Studierichting;
             BioInput.Text            = user.Bio;
+            // Username niet gedwongen vanuit email
             UsernameInput.Text       = user.Username;
 
-            // Profielfoto preview
             LaadFotoPreview(user.ProfielFotoPad);
 
-            // Tags
             _tags.Clear();
             TagsPanel.Children.Clear();
             foreach (var tag in user.Tags) VoegTagChipToe(tag);
@@ -58,7 +56,6 @@ namespace MoreConnector.Views
             }
         }
 
-        // ── Tags ─────────────────────────────────────────────────────────────
         private void OnTagToevoegen(object sender, RoutedEventArgs e)
         {
             string tag = TagInput.Text.Trim().TrimStart('#');
@@ -97,7 +94,6 @@ namespace MoreConnector.Views
             TagsPanel.Children.Add(chip);
         }
 
-        // ── Opslaan ──────────────────────────────────────────────────────────
         private void OnOpslaanClick(object sender, RoutedEventArgs e)
         {
             string voornaam       = VoornaamInput.Text.Trim();
@@ -121,21 +117,63 @@ namespace MoreConnector.Views
                 return;
             }
 
-            if (!string.IsNullOrEmpty(username)) _state.PasUsernameToe(username);
-            _state.PasProfielToe(voornaam, achternaam, email, telefoon, studierichting, bio);
+            _state.PasProfielToe(voornaam, achternaam, email, telefoon, studierichting, bio, username, _state.HuidigeGebruiker?.ProfielFotoPad ?? "");
 
             if (_state.HuidigeGebruiker != null)
             {
-                // Sla interesses op in DB
                 try { UserRepository.SlaInteressesOp(_state.HuidigeGebruiker.Id, _tags); }
-                catch { /* DB niet beschikbaar - lokaal opslaan */ }
+                catch { }
             }
 
             MessageBox.Show("Profiel opgeslagen!", "Opgeslagen", MessageBoxButton.OK, MessageBoxImage.Information);
             Nav().AuthFrame.Navigate(new ProfilePage());
         }
 
-        // ── Foto beheer ───────────────────────────────────────────────────────
+        // ── Wachtwoord wijzigen ───────────────────────────────────────────────
+        private void OnWachtwoordWijzigenClick(object sender, RoutedEventArgs e)
+        {
+            var user = _state.HuidigeGebruiker;
+            if (user == null) return;
+
+            string huidig = TxtHuidigWachtwoord.Password;
+            string nieuw1 = TxtNieuwWachtwoord.Password;
+            string nieuw2 = TxtBevestigWachtwoord.Password;
+
+            if (string.IsNullOrWhiteSpace(huidig))
+            {
+                MessageBox.Show("Vul je huidig wachtwoord in.", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (nieuw1.Length < 6)
+            {
+                MessageBox.Show("Nieuw wachtwoord moet minstens 6 tekens zijn.", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (nieuw1 != nieuw2)
+            {
+                MessageBox.Show("Nieuwe wachtwoorden komen niet overeen.", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            try
+            {
+                bool gelukt = UserRepository.WijzigEigenWachtwoord(user.Id, huidig, nieuw1);
+                if (!gelukt)
+                    MessageBox.Show("Huidig wachtwoord is onjuist.", "Fout", MessageBoxButton.OK, MessageBoxImage.Warning);
+                else
+                {
+                    MessageBox.Show("Wachtwoord succesvol gewijzigd!", "Opgeslagen", MessageBoxButton.OK, MessageBoxImage.Information);
+                    TxtHuidigWachtwoord.Password    = "";
+                    TxtNieuwWachtwoord.Password     = "";
+                    TxtBevestigWachtwoord.Password  = "";
+                }
+            }
+            catch (System.Exception ex)
+            {
+                MessageBox.Show($"Fout: {ex.Message}", "Fout", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
         private void OnWijzigFotoClick(object sender, RoutedEventArgs e)
         {
             var dialog = new Microsoft.Win32.OpenFileDialog
@@ -156,7 +194,6 @@ namespace MoreConnector.Views
             LaadFotoPreview("");
         }
 
-        // ── Account verwijderen ───────────────────────────────────────────────
         private void OnAccountVerwijderenClick(object sender, RoutedEventArgs e)
         {
             var bevestig = MessageBox.Show(
@@ -166,19 +203,19 @@ namespace MoreConnector.Views
             {
                 var g = _state.Gebruikers.FirstOrDefault(x => x.Id == _state.HuidigeGebruiker?.Id);
                 if (g != null) _state.Gebruikers.Remove(g);
+                if (_state.HuidigeGebruiker != null)
+                {
+                    try { UserRepository.Verwijder(_state.HuidigeGebruiker.Id); } catch { }
+                }
                 _state.HuidigeGebruiker = null;
                 Nav().NavigateToLogin();
             }
         }
 
         private void OnHomeClick(object sender, RoutedEventArgs e)         => Nav().AuthFrame.Navigate(new Feed());
-
         private void OnBerichtenClick(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void OnAanmakenClick(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void OnProfielClick(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());
@@ -191,11 +228,7 @@ namespace MoreConnector.Views
         private void SideNav_Uitloggen(object sender, RoutedEventArgs e)
         {
             var r = MessageBox.Show("Wil je uitloggen?", "Uitloggen", MessageBoxButton.YesNo, MessageBoxImage.Question);
-            if (r == MessageBoxResult.Yes)
-            {
-                AppState.Instance.HuidigeGebruiker = null;
-                Nav().NavigateToLogin();
-            }
+            if (r == MessageBoxResult.Yes) { AppState.Instance.HuidigeGebruiker = null; Nav().NavigateToLogin(); }
         }
         private void OnProfielAvatarClick(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new ProfilePage());
 

@@ -1,5 +1,6 @@
 using MoreConnector.Database;
 using MoreConnector.Models;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -20,18 +21,20 @@ namespace MoreConnector.Views
             _gebruiker = gebruiker;
             LaadProfiel();
             LaadPosts();
+            LaadActiviteiten();
+            LaadConnecties();
         }
 
         private void LaadProfiel()
         {
             NaamTekst.Text     = _gebruiker.VolledigeNaam;
-            UsernameTekst.Text = $"@{_gebruiker.Username}";
+            UsernameTekst.Text = string.IsNullOrWhiteSpace(_gebruiker.Username)
+                ? "" : $"@{_gebruiker.Username}";
             StudieTekst.Text   = _gebruiker.Study;
             BioTekst.Text      = _gebruiker.Bio;
             ProfielInitiaal.Text = _gebruiker.Firstname.Length > 0
                 ? _gebruiker.Firstname[0].ToString().ToUpper() : "?";
 
-            // Profielfoto
             var bmp = ImageHelper.LaadGeschaald(_gebruiker.ProfielFotoPad, 200);
             if (bmp != null)
             {
@@ -73,12 +76,12 @@ namespace MoreConnector.Views
             switch (status)
             {
                 case "accepted":
-                    VriendenBtn.Content    = "✓ Vrienden";
-                    VriendenBtn.IsEnabled  = false;
+                    VriendenBtn.Content   = "✓ Vrienden";
+                    VriendenBtn.IsEnabled = false;
                     break;
                 case "pending":
-                    VriendenBtn.Content    = "⏳ Verzonden";
-                    VriendenBtn.IsEnabled  = false;
+                    VriendenBtn.Content   = "⏳ Verzonden";
+                    VriendenBtn.IsEnabled = false;
                     break;
             }
         }
@@ -106,7 +109,7 @@ namespace MoreConnector.Views
                     });
                     sp.Children.Add(new TextBlock
                     {
-                        Text = p.CreatedAt.ToString("d MMMM yyyy"),
+                        Text = p.CreatedAt.ToString("d MMMM yyyy HH:mm"),
                         Foreground = new SolidColorBrush(Color.FromRgb(136, 153, 170)),
                         FontSize = 12, Margin = new Thickness(0, 6, 0, 0)
                     });
@@ -123,6 +126,99 @@ namespace MoreConnector.Views
                     Foreground = new SolidColorBrush(Color.FromRgb(136, 153, 170)),
                     FontSize = 14
                 });
+        }
+
+        private void LaadActiviteiten()
+        {
+            if (ActiviteitenPanel == null) return;
+            ActiviteitenPanel.Children.Clear();
+
+            // Filter evenementen van deze gebruiker
+            string auteurNaam = _gebruiker.VolledigeNaam;
+            bool gevonden = false;
+
+            foreach (var ev in _state.Evenementen)
+            {
+                if (ev.Auteur != auteurNaam) continue;
+                gevonden = true;
+
+                var kaart = new Border
+                {
+                    Background  = new SolidColorBrush(Color.FromRgb(30, 46, 64)),
+                    CornerRadius = new CornerRadius(12),
+                    Padding     = new Thickness(16),
+                    Margin      = new Thickness(0, 0, 0, 10),
+                    BorderBrush  = new SolidColorBrush(Color.FromRgb(255, 140, 0)),
+                    BorderThickness = new Thickness(1)
+                };
+                var sp = new StackPanel();
+                sp.Children.Add(new TextBlock { Text = ev.Naam, Foreground = new SolidColorBrush(Colors.White), FontSize = 14, FontWeight = FontWeights.SemiBold });
+                sp.Children.Add(new TextBlock { Text = $"{ev.Locatie}  ·  {ev.DatumTekst}", Foreground = new SolidColorBrush(Color.FromRgb(255, 140, 0)), FontSize = 12, Margin = new Thickness(0, 4, 0, 0) });
+                kaart.Child = sp;
+                ActiviteitenPanel.Children.Add(kaart);
+            }
+
+            if (!gevonden)
+                ActiviteitenPanel.Children.Add(new TextBlock
+                {
+                    Text = "Geen activiteiten.",
+                    Foreground = new SolidColorBrush(Color.FromRgb(136, 153, 170)),
+                    FontSize = 13
+                });
+        }
+
+        private void LaadConnecties()
+        {
+            if (ConnectiesPanel == null) return;
+            ConnectiesPanel.Children.Clear();
+
+            try
+            {
+                var vrienden = FriendshipRepository.GetVrienden(_gebruiker.Id);
+                foreach (var v in vrienden)
+                {
+                    var kaart = new Border
+                    {
+                        Background   = new SolidColorBrush(Color.FromRgb(30, 46, 64)),
+                        CornerRadius  = new CornerRadius(10),
+                        Padding      = new Thickness(12, 10, 12, 10),
+                        Margin       = new Thickness(0, 0, 0, 8),
+                        BorderBrush  = new SolidColorBrush(Color.FromRgb(50, 70, 90)),
+                        BorderThickness = new Thickness(1)
+                    };
+                    var row = new StackPanel { Orientation = Orientation.Horizontal };
+                    var ell = new Ellipse
+                    {
+                        Width = 36, Height = 36, Margin = new Thickness(0, 0, 12, 0),
+                        Fill  = new SolidColorBrush(Color.FromRgb(255, 140, 0))
+                    };
+                    row.Children.Add(ell);
+                    var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
+                    info.Children.Add(new TextBlock { Text = v.VolledigeNaam, Foreground = new SolidColorBrush(Colors.White), FontSize = 13, FontWeight = FontWeights.SemiBold });
+                    if (!string.IsNullOrWhiteSpace(v.Username))
+                        info.Children.Add(new TextBlock { Text = $"@{v.Username}", Foreground = new SolidColorBrush(Color.FromRgb(255, 140, 0)), FontSize = 11 });
+                    row.Children.Add(info);
+                    kaart.Child = row;
+                    ConnectiesPanel.Children.Add(kaart);
+                }
+
+                if (vrienden.Count == 0)
+                    ConnectiesPanel.Children.Add(new TextBlock
+                    {
+                        Text = "Geen connecties.",
+                        Foreground = new SolidColorBrush(Color.FromRgb(136, 153, 170)),
+                        FontSize = 13
+                    });
+            }
+            catch
+            {
+                ConnectiesPanel.Children.Add(new TextBlock
+                {
+                    Text = "Connecties niet beschikbaar.",
+                    Foreground = new SolidColorBrush(Color.FromRgb(136, 153, 170)),
+                    FontSize = 13
+                });
+            }
         }
 
         private void OnVriendenBtnClick(object sender, RoutedEventArgs e)

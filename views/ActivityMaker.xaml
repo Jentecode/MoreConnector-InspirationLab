@@ -149,12 +149,18 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0">
-                        <TextBlock Text="Datum &amp; Tijd" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="DatumTijdInput" Style="{StaticResource InputStyle}"/>
+                        <TextBlock Text="Datum" Style="{StaticResource LabelStyle}"/>
+                        <DatePicker x:Name="DatumPicker" Margin="0,0,0,8" FontSize="13"
+                                    SelectedDateFormat="Short" FirstDayOfWeek="Monday"/>
+                        <TextBlock Text="Tijdstip (HH:mm)" Style="{StaticResource LabelStyle}"/>
+                        <TextBox x:Name="DatumTijdInput" Style="{StaticResource InputStyle}"
+                                 Text="12:00" ToolTip="Vul tijd in als HH:mm (bijv. 14:30)"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="Locatie" Style="{StaticResource LabelStyle}"/>
-                        <TextBox x:Name="LocatieInput" Style="{StaticResource InputStyle}"/>
+                        <TextBox x:Name="LocatieInput" Style="{StaticResource InputStyle}" Margin="0,0,0,8"/>
+                        <TextBlock Text="Max. deelnemers (0 = onbeperkt)" Style="{StaticResource LabelStyle}"/>
+                        <TextBox x:Name="MaxDeelnemersInput" Style="{StaticResource InputStyle}" Text="0"/>
                     </StackPanel>
                 </Grid>
 
