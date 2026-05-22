@@ -14,7 +14,7 @@ namespace MoreConnector.Database
             using var cmd  = conn.CreateCommand();
             cmd.CommandText = @"
                 SELECT c.id, c.post_id, c.user_id, c.content, c.created_at,
-                       CONCAT(u.firstname, ' ', u.lastname) AS author
+                       CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname, ' ', u.lastname) END AS author
                 FROM   comments c
                 JOIN   users u ON u.id = c.user_id
                 WHERE  c.post_id = @pid
@@ -40,14 +40,81 @@ namespace MoreConnector.Database
         {
             using var conn = DbConnection.GetConnection();
             using var cmd  = conn.CreateCommand();
-            cmd.CommandText = @"
-                INSERT INTO comments (post_id, user_id, content)
-                VALUES (@pid, @uid, @content);
-                SELECT LAST_INSERT_ID();";
+            cmd.CommandText = "INSERT INTO comments (post_id, user_id, content) VALUES (@pid, @uid, @content)";
             cmd.Parameters.AddWithValue("@pid",     postId);
             cmd.Parameters.AddWithValue("@uid",     userId);
             cmd.Parameters.AddWithValue("@content", content);
+            cmd.ExecuteNonQuery();
+
+            using var id  = conn.CreateCommand();
+            id.CommandText = "SELECT LAST_INSERT_ID()";
+            return Convert.ToInt32(id.ExecuteScalar());
+        }
+
+        public static bool ToggleLike(int commentId, int userId)
+        {
+            // Zorg dat de tabel bestaat
+            using (var conn = DbConnection.GetConnection())
+            using (var mk = conn.CreateCommand())
+            {
+                mk.CommandText = @"CREATE TABLE IF NOT EXISTS comment_likes (
+                    comment_id INT NOT NULL,
+                    user_id    INT NOT NULL,
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    PRIMARY KEY (comment_id, user_id)
+                )";
+                mk.ExecuteNonQuery();
+            }
+
+            bool alGeliked;
+            using (var conn = DbConnection.GetConnection())
+            using (var chk  = conn.CreateCommand())
+            {
+                chk.CommandText = "SELECT COUNT(*) FROM comment_likes WHERE comment_id=@cid AND user_id=@uid";
+                chk.Parameters.AddWithValue("@cid", commentId);
+                chk.Parameters.AddWithValue("@uid", userId);
+                alGeliked = Convert.ToInt32(chk.ExecuteScalar()) > 0;
+            }
+
+            using (var conn = DbConnection.GetConnection())
+            using (var cmd  = conn.CreateCommand())
+            {
+                if (alGeliked)
+                {
+                    cmd.CommandText = "DELETE FROM comment_likes WHERE comment_id=@cid AND user_id=@uid";
+                    cmd.Parameters.AddWithValue("@cid", commentId);
+                    cmd.Parameters.AddWithValue("@uid", userId);
+                    cmd.ExecuteNonQuery();
+                    return false;
+                }
+                else
+                {
+                    cmd.CommandText = "INSERT INTO comment_likes (comment_id, user_id) VALUES (@cid, @uid)";
+                    cmd.Parameters.AddWithValue("@cid", commentId);
+                    cmd.Parameters.AddWithValue("@uid", userId);
+                    cmd.ExecuteNonQuery();
+                    return true;
+                }
+            }
+        }
+
+        public static int GetLikeCount(int commentId)
+        {
+            using var conn = DbConnection.GetConnection();
+            using var cmd  = conn.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM comment_likes WHERE comment_id=@cid";
+            cmd.Parameters.AddWithValue("@cid", commentId);
             return Convert.ToInt32(cmd.ExecuteScalar());
+        }
+
+        public static bool IsLikedByUser(int commentId, int userId)
+        {
+            using var conn = DbConnection.GetConnection();
+            using var cmd  = conn.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM comment_likes WHERE comment_id=@cid AND user_id=@uid";
+            cmd.Parameters.AddWithValue("@cid", commentId);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            return Convert.ToInt32(cmd.ExecuteScalar()) > 0;
         }
 
         public static void Verwijder(int commentId)

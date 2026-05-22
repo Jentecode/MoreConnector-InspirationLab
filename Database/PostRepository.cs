@@ -7,7 +7,6 @@ namespace MoreConnector.Database
 {
     public static class PostRepository
     {
-        // ── Ophalen ───────────────────────────────────────────────────────────
         public static List<Post> GetAll(int huidigeUserId = 0)
         {
             var list = new List<Post>();
@@ -15,13 +14,13 @@ namespace MoreConnector.Database
             using var cmd  = conn.CreateCommand();
             cmd.CommandText = @"
                 SELECT p.id, p.user_id, p.content, p.image_path, p.created_at,
-                       CONCAT(u.firstname, ' ', u.lastname) AS author,
-                       COUNT(DISTINCT l.id)                 AS like_count,
+                       CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname, ' ', u.lastname) END AS author,
+                       COUNT(DISTINCT l.user_id)            AS like_count,
                        MAX(CASE WHEN l.user_id=@uid THEN 1 ELSE 0 END) AS liked_by_me
                 FROM   posts p
-                JOIN   users u ON u.id = p.user_id
+                JOIN   users u ON u.id = p.user_id AND COALESCE(u.is_active, 1) = 1
                 LEFT JOIN likes l ON l.post_id = p.id
-                GROUP BY p.id
+                GROUP BY p.id, p.user_id, p.content, p.image_path, p.created_at, u.username, u.firstname, u.lastname
                 ORDER BY p.created_at DESC";
             cmd.Parameters.AddWithValue("@uid", huidigeUserId);
             using var r = cmd.ExecuteReader();
@@ -36,8 +35,8 @@ namespace MoreConnector.Database
             using var cmd  = conn.CreateCommand();
             cmd.CommandText = @"
                 SELECT p.id, p.user_id, p.content, p.image_path, p.created_at,
-                       CONCAT(u.firstname, ' ', u.lastname) AS author,
-                       COUNT(DISTINCT l.id) AS like_count, 0 AS liked_by_me
+                       CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname, ' ', u.lastname) END AS author,
+                       COUNT(DISTINCT l.user_id) AS like_count, 0 AS liked_by_me
                 FROM   posts p
                 JOIN   users u ON u.id = p.user_id
                 LEFT JOIN likes l ON l.post_id = p.id
@@ -49,8 +48,6 @@ namespace MoreConnector.Database
             while (r.Read()) list.Add(MapPost(r));
             return list;
         }
-
-        // ── Aanmaken ──────────────────────────────────────────────────────────
         public static int Aanmaken(int userId, string content, string imagePath = "")
         {
             using var conn = DbConnection.GetConnection();
@@ -64,8 +61,6 @@ namespace MoreConnector.Database
             cmd.Parameters.AddWithValue("@img",     imagePath);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
-
-        // ── Verwijderen ───────────────────────────────────────────────────────
         public static void Verwijder(int postId)
         {
             using var conn = DbConnection.GetConnection();
@@ -83,35 +78,37 @@ namespace MoreConnector.Database
                 cmd.ExecuteNonQuery();
             }
         }
-
-        // ── Likes ─────────────────────────────────────────────────────────────
         public static bool ToggleLike(int postId, int userId)
         {
-            using var conn = DbConnection.GetConnection();
-
-            // Kijk of al geliked
-            using (var chk = conn.CreateCommand())
+            // Stap 1: check of al geliked
+            bool alGeliked;
+            using (var conn = DbConnection.GetConnection())
+            using (var chk  = conn.CreateCommand())
             {
                 chk.CommandText = "SELECT COUNT(*) FROM likes WHERE post_id=@pid AND user_id=@uid";
                 chk.Parameters.AddWithValue("@pid", postId);
                 chk.Parameters.AddWithValue("@uid", userId);
-                bool alGeliked = Convert.ToInt32(chk.ExecuteScalar()) > 0;
+                alGeliked = Convert.ToInt32(chk.ExecuteScalar()) > 0;
+            }
 
-                using var tog = conn.CreateCommand();
+            // Stap 2: toggle in aparte verbinding
+            using (var conn = DbConnection.GetConnection())
+            using (var cmd  = conn.CreateCommand())
+            {
                 if (alGeliked)
                 {
-                    tog.CommandText = "DELETE FROM likes WHERE post_id=@pid AND user_id=@uid";
-                    tog.Parameters.AddWithValue("@pid", postId);
-                    tog.Parameters.AddWithValue("@uid", userId);
-                    tog.ExecuteNonQuery();
+                    cmd.CommandText = "DELETE FROM likes WHERE post_id=@pid AND user_id=@uid";
+                    cmd.Parameters.AddWithValue("@pid", postId);
+                    cmd.Parameters.AddWithValue("@uid", userId);
+                    cmd.ExecuteNonQuery();
                     return false; // unliked
                 }
                 else
                 {
-                    tog.CommandText = "INSERT INTO likes (post_id, user_id) VALUES (@pid, @uid)";
-                    tog.Parameters.AddWithValue("@pid", postId);
-                    tog.Parameters.AddWithValue("@uid", userId);
-                    tog.ExecuteNonQuery();
+                    cmd.CommandText = "INSERT INTO likes (post_id, user_id) VALUES (@pid, @uid)";
+                    cmd.Parameters.AddWithValue("@pid", postId);
+                    cmd.Parameters.AddWithValue("@uid", userId);
+                    cmd.ExecuteNonQuery();
                     return true;  // liked
                 }
             }
@@ -125,8 +122,6 @@ namespace MoreConnector.Database
             cmd.Parameters.AddWithValue("@pid", postId);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
-
-        // ── Mapper ────────────────────────────────────────────────────────────
         private static Post MapPost(MySqlDataReader r) => new()
         {
             Id         = r.GetInt32("id"),

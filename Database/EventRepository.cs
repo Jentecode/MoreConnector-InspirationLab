@@ -16,11 +16,11 @@ namespace MoreConnector.Database
                 SELECT e.id, e.creator_id, e.title, e.description, e.location,
                        e.event_date, e.max_participants, e.created_at,
                        COALESCE(e.image_path,'') AS image_path,
-                       CONCAT(u.firstname,' ',u.lastname) AS creator_name,
+                       CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname,' ',u.lastname) END AS creator_name,
                        COUNT(DISTINCT ep.id)              AS participant_count,
                        MAX(CASE WHEN ep.user_id=@uid THEN 1 ELSE 0 END) AS joined_by_me
                 FROM   events e
-                JOIN   users u ON u.id = e.creator_id
+                JOIN   users u ON u.id = e.creator_id AND COALESCE(u.is_active, 1) = 1
                 LEFT JOIN event_participants ep ON ep.event_id = e.id
                 GROUP BY e.id
                 ORDER BY e.event_date ASC";
@@ -38,7 +38,7 @@ namespace MoreConnector.Database
                 SELECT e.id, e.creator_id, e.title, e.description, e.location,
                        e.event_date, e.max_participants, e.created_at,
                        COALESCE(e.image_path,'') AS image_path,
-                       CONCAT(u.firstname,' ',u.lastname) AS creator_name,
+                       CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname,' ',u.lastname) END AS creator_name,
                        COUNT(DISTINCT ep.id) AS participant_count,
                        MAX(CASE WHEN ep.user_id=@uid THEN 1 ELSE 0 END) AS joined_by_me
                 FROM   events e
@@ -159,7 +159,7 @@ namespace MoreConnector.Database
             {
                 using var cmd = conn.CreateCommand();
                 cmd.CommandText = @"
-                    SELECT CONCAT(u.firstname,' ',u.lastname)
+                    SELECT CASE WHEN u.username IS NOT NULL AND u.username != '' THEN u.username ELSE CONCAT(u.firstname,' ',u.lastname) END
                     FROM   event_participants ep JOIN users u ON u.id = ep.user_id
                     WHERE  ep.event_id = @eid";
                 cmd.Parameters.AddWithValue("@eid", eventId);

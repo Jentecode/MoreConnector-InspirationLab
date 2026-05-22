@@ -9,7 +9,6 @@ namespace MoreConnector.Database
     /// </summary>
     public static class DbConnection
     {
-        // ── Verbindingsinstellingen ───────────────────────────────────────────
         private const string Server   = "localhost";
         private const int    Port     = 3306;
         private const string Database = "moreconnector";

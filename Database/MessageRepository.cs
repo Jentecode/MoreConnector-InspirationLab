@@ -16,10 +16,11 @@ namespace MoreConnector.Database
             cmd.CommandText = @"
                 SELECT m.id, m.sender_id, m.receiver_id, m.message, m.sent_at,
                        CONCAT(s.firstname,' ',s.lastname) AS sender_name,
-                       CONCAT(r.firstname,' ',r.lastname) AS receiver_name
+                       CONCAT(r.firstname,' ',r.lastname) AS receiver_name,
+                       COALESCE(s.profile_photo,'') AS sender_photo
                 FROM   messages m
-                JOIN   users s ON s.id = m.sender_id
-                JOIN   users r ON r.id = m.receiver_id
+                JOIN   users s ON s.id = m.sender_id AND COALESCE(s.is_active, 1) = 1
+                JOIN   users r ON r.id = m.receiver_id AND COALESCE(r.is_active, 1) = 1
                 WHERE  (m.sender_id=@u1 AND m.receiver_id=@u2)
                     OR (m.sender_id=@u2 AND m.receiver_id=@u1)
                 ORDER BY m.sent_at ASC";
@@ -37,7 +38,8 @@ namespace MoreConnector.Database
                     SentAt       = r.GetDateTime("sent_at"),
                     SenderName   = r.GetString("sender_name"),
                     ReceiverName = r.GetString("receiver_name"),
-                    IsOwn        = r.GetInt32("sender_id") == userId1
+                    IsOwn        = r.GetInt32("sender_id") == userId1,
+                    SenderPhoto  = r.IsDBNull(r.GetOrdinal("sender_photo")) ? "" : r.GetString("sender_photo")
                 });
             }
             return list;
@@ -53,6 +55,7 @@ namespace MoreConnector.Database
                 SELECT DISTINCT u.id, u.firstname, u.lastname, u.email, u.study, u.bio, u.created_at
                 FROM   messages m
                 JOIN   users u ON u.id = CASE WHEN m.sender_id=@uid THEN m.receiver_id ELSE m.sender_id END
+                           AND COALESCE(u.is_active, 1) = 1
                 WHERE  m.sender_id=@uid OR m.receiver_id=@uid
                 ORDER BY u.firstname";
             cmd.Parameters.AddWithValue("@uid", userId);

@@ -7,7 +7,6 @@ namespace MoreConnector.Database
 {
     public static class GroupRepository
     {
-        // ── Groep aanmaken ────────────────────────────────────────────────────
         public static int MaakGroep(int creatorId, string naam, string beschrijving = "")
         {
             using var conn = DbConnection.GetConnection();
@@ -25,8 +24,6 @@ namespace MoreConnector.Database
             VoegLidToe(groupId, creatorId);
             return groupId;
         }
-
-        // ── Lid toevoegen ─────────────────────────────────────────────────────
         public static void VoegLidToe(int groupId, int userId)
         {
             using var conn = DbConnection.GetConnection();
@@ -38,8 +35,6 @@ namespace MoreConnector.Database
             cmd.Parameters.AddWithValue("@uid", userId);
             cmd.ExecuteNonQuery();
         }
-
-        // ── Groepen van gebruiker ─────────────────────────────────────────────
         public static List<ChatGroep> GetGroepenVanGebruiker(int userId)
         {
             var list = new List<ChatGroep>();
@@ -68,8 +63,6 @@ namespace MoreConnector.Database
             }
             return list;
         }
-
-        // ── Leden ophalen ─────────────────────────────────────────────────────
         public static List<User> GetLeden(int groupId)
         {
             var list = new List<User>();
@@ -97,8 +90,6 @@ namespace MoreConnector.Database
                 });
             return list;
         }
-
-        // ── Groepsberichten ───────────────────────────────────────────────────
         public static List<ChatBericht> GetBerichten(int groupId)
         {
             var list = new List<ChatBericht>();
@@ -107,7 +98,8 @@ namespace MoreConnector.Database
             cmd.CommandText = @"
                 SELECT gm.id, gm.sender_id, gm.message, gm.sent_at,
                        CONCAT(u.firstname,' ',u.lastname) AS sender_name,
-                       COALESCE(u.username, '') AS sender_username
+                       COALESCE(u.username, '') AS sender_username,
+                       COALESCE(u.profile_photo,'') AS sender_photo
                 FROM   group_messages gm
                 JOIN   users u ON u.id = gm.sender_id
                 WHERE  gm.group_id = @gid
@@ -123,7 +115,8 @@ namespace MoreConnector.Database
                     SentAt       = r.GetDateTime("sent_at"),
                     SenderNaam   = !string.IsNullOrEmpty(r.GetString("sender_username"))
                                    ? $"@{r.GetString("sender_username")}"
-                                   : r.GetString("sender_name")
+                                   : r.GetString("sender_name"),
+                    SenderPhoto  = r.IsDBNull(r.GetOrdinal("sender_photo")) ? "" : r.GetString("sender_photo")
                 });
             return list;
         }
@@ -141,5 +134,40 @@ namespace MoreConnector.Database
             cmd.Parameters.AddWithValue("@msg", message);
             return Convert.ToInt32(cmd.ExecuteScalar());
         }
+        public static void HernoemenGroep(int groupId, string nieuweNaam)
+        {
+            using var conn = DbConnection.GetConnection();
+            using var cmd  = conn.CreateCommand();
+            cmd.CommandText = "UPDATE `groups` SET name=@naam WHERE id=@gid";
+            cmd.Parameters.AddWithValue("@naam", nieuweNaam);
+            cmd.Parameters.AddWithValue("@gid",  groupId);
+            cmd.ExecuteNonQuery();
+        }
+        public static void VerwijderLid(int groupId, int userId)
+        {
+            using var conn = DbConnection.GetConnection();
+            using var cmd  = conn.CreateCommand();
+            cmd.CommandText = "DELETE FROM group_members WHERE group_id=@gid AND user_id=@uid";
+            cmd.Parameters.AddWithValue("@gid", groupId);
+            cmd.Parameters.AddWithValue("@uid", userId);
+            cmd.ExecuteNonQuery();
+        }
+        public static void VerwijderGroep(int groupId)
+        {
+            using var conn = DbConnection.GetConnection();
+            foreach (var sql in new[]
+            {
+                "DELETE FROM group_messages WHERE group_id=@gid",
+                "DELETE FROM group_members  WHERE group_id=@gid",
+                "DELETE FROM `groups`       WHERE id=@gid"
+            })
+            {
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = sql;
+                cmd.Parameters.AddWithValue("@gid", groupId);
+                try { cmd.ExecuteNonQuery(); } catch { }
+            }
+        }
+
     }
 }
