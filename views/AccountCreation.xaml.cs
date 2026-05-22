@@ -42,11 +42,11 @@ namespace MoreConnector
 
         private void TxtEmail_GotFocus(object sender, RoutedEventArgs e)
         {
-            if (TxtEmail.Text == "email-adres") { TxtEmail.Text = ""; TxtEmail.Foreground = Brushes.Black; }
+            if (TxtEmail.Text == "e-mailadres") { TxtEmail.Text = ""; TxtEmail.Foreground = Brushes.Black; }
         }
         private void TxtEmail_LostFocus(object sender, RoutedEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(TxtEmail.Text)) { TxtEmail.Text = "email-adres"; TxtEmail.Foreground = Brushes.Gray; }
+            if (string.IsNullOrWhiteSpace(TxtEmail.Text)) { TxtEmail.Text = "e-mailadres"; TxtEmail.Foreground = Brushes.Gray; }
         }
 
         private void TxtTelefoon_GotFocus(object sender, RoutedEventArgs e)
@@ -86,38 +86,72 @@ namespace MoreConnector
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(email) || email == "email-adres" || !email.Contains("@"))
+            if (!Models.UsernameValidator.IsGeldig(voornaam) || !Models.UsernameValidator.IsGeldig(achternaam))
+            {
+                MessageBox.Show("Voor- of achternaam bevat ongepaste woorden.", "Ongepaste naam",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (!Models.UsernameValidator.IsGeldig(email.Split('@')[0]))
+            {
+                MessageBox.Show("E-mailadres bevat ongepaste woorden.", "Ongepaste inhoud",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (string.IsNullOrWhiteSpace(email) || email == "e-mailadres" || !IsGeldigEmail(email))
             {
                 MessageBox.Show("Vul een geldig e-mailadres in.", "Validatiefout",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
-            if (TxtWachtwoord.Password.Length == 0)
+            if (TxtWachtwoord.Password.Length < 6)
             {
-                MessageBox.Show("Vul een wachtwoord in.", "Validatiefout",
+                MessageBox.Show("Wachtwoord moet minstens 6 tekens zijn.", "Validatiefout",
                     MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
             try
             {
+                // Check of email al in gebruik is
+                if (UserRepository.EmailBestaat(email))
+                {
+                    MessageBox.Show("Dit e-mailadres is al in gebruik.", "Registratie mislukt",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
                 string studierichting = TxtStudierichting.Text.Trim();
                 if (studierichting == "studierichting") studierichting = "";
 
-                // Gebruik email-prefix als nickname als niet opgegeven
                 string gebruikersnaam = string.IsNullOrWhiteSpace(nickname)
                     ? email.Split('@')[0]
                     : nickname;
+
+                // Check ongepaste username
+                var usernameError = Models.UsernameValidator.Valideer(gebruikersnaam);
+                if (usernameError != null)
+                {
+                    MessageBox.Show(usernameError, "Ongepaste gebruikersnaam",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
 
                 int newId = UserRepository.Registreer(
                     voornaam, achternaam, email,
                     TxtWachtwoord.Password,
                     studierichting, "", gebruikersnaam);
 
-                MessageBox.Show("Account aangemaakt! Je kunt nu inloggen.", "Succes",
-                    MessageBoxButton.OK, MessageBoxImage.Information);
-                ((Views.MoreConnector)Window.GetWindow(this)).NavigateToLogin();
+                // Stuur verificatiecode
+                string token = Database.EmailVerificationRepository.MaakToken(email);
+                Database.EmailService.StuurEmailVerificatie(email, token);
+
+                MessageBox.Show($"Account aangemaakt! Er is een verificatiecode verstuurd naar {email}.\nVerifieer je e-mailadres om in te loggen.",
+                    "Bijna klaar!", MessageBoxButton.OK, MessageBoxImage.Information);
+                ((Views.MoreConnector)Window.GetWindow(this)).NavigateToEmailVerification(email);
             }
             catch (System.Exception ex)
             {
@@ -131,6 +165,12 @@ namespace MoreConnector
             if (WachtwoordPlaceholder != null)
                 WachtwoordPlaceholder.Visibility = TxtWachtwoord.Password.Length > 0
                     ? Visibility.Collapsed : Visibility.Visible;
+        }
+
+        private static bool IsGeldigEmail(string email)
+        {
+            try { _ = new System.Net.Mail.MailAddress(email); return true; }
+            catch { return false; }
         }
     }
 }

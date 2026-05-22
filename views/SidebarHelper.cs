@@ -15,7 +15,11 @@ namespace MoreConnector.Views
 
         public static void Init(Page page, ActivePage active)
         {
-            page.Loaded += (_, _) => Refresh(page, active);
+            // Fire immediately if already loaded, AND on every future load
+            if (page.IsLoaded)
+                Refresh(page, active);
+            else
+                page.Loaded += (_, _) => Refresh(page, active);
         }
 
         public static void Refresh(Page page, ActivePage active)
@@ -25,9 +29,6 @@ namespace MoreConnector.Views
             SetText(page, "SideNaamLabel",
                 user == null ? "Profiel" :
                 string.IsNullOrWhiteSpace(user.Username) ? user.VolledigeNaam : $"@{user.Username}");
-
-
-            // FIX: check both IsAdmin flag and Role string
             bool isAdmin = user?.IsAdmin == true || user?.Role == "Admin";
             SetVisibility(page, "BtnAdmin", isAdmin ? Visibility.Visible : Visibility.Collapsed);
             SetText(page, "SideRolLabel", isAdmin ? "Admin" : "");

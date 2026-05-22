@@ -262,25 +262,38 @@
                                         <TextBlock Text="{Binding Email}" Foreground="{StaticResource MutedBrush}" FontSize="11" Opacity="0.7"/>
                                     </StackPanel>
                                     <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                        <Button Content="Verban"
-                                                Style="{StaticResource WarnButtonStyle}"
+                                        <!-- Ban/Unban toggle via DataTrigger op IsActive -->
+                                        <Button Tag="{Binding}"
+                                                Click="OnBanToggleClick"
+                                                Margin="0,0,6,0"
+                                                Padding="8,4" BorderThickness="0"
+                                                Foreground="White" Cursor="Hand" FontSize="11">
+                                            <Button.Style>
+                                                <Style TargetType="Button">
+                                                    <Setter Property="Content"     Value="Verban"/>
+                                                    <Setter Property="Background"  Value="#883333"/>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsActive}" Value="False">
+                                                            <Setter Property="Content"    Value="Deblokkeer"/>
+                                                            <Setter Property="Background" Value="#338833"/>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Button.Style>
+                                        </Button>
+                                        <Button Content="✉ Email"
+                                                Background="#336699" Foreground="White"
+                                                BorderThickness="0" Padding="8,4"
+                                                Cursor="Hand" FontSize="11"
                                                 Tag="{Binding}"
-                                                Click="OnGebruikerVerbannenClick"
-                                                Margin="0,0,6,0"/>
-                                        <Button Content="Deblokkeer"
-                                                Style="{StaticResource WarnButtonStyle}"
-                                                Tag="{Binding}"
-                                                Click="OnGebruikerDeblokkeerenClick"
+                                                Click="OnEmailWijzigenClick"
                                                 Margin="0,0,6,0"/>
                                         <Button Content="🔑 Wachtwoord"
-                                                Style="{StaticResource WarnButtonStyle}"
+                                                Background="#555566" Foreground="White"
+                                                BorderThickness="0" Padding="8,4"
+                                                Cursor="Hand" FontSize="11"
                                                 Tag="{Binding}"
-                                                Click="OnWachtwoordWijzigenClick"
-                                                Margin="0,0,6,0"/>
-                                        <Button Content="Verwijderen"
-                                                Style="{StaticResource DangerButtonStyle}"
-                                                Tag="{Binding}"
-                                                Click="OnGebruikerVerwijderenClick"/>
+                                                Click="OnWachtwoordWijzigenClick"/>
                                     </StackPanel>
                                 </Grid>
                             </Border>

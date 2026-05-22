@@ -12,7 +12,35 @@ namespace MoreConnector.Views
         private readonly List<string> _tags = new();
         private readonly AppState _state = AppState.Instance;
 
-        public PostMaker() { InitializeComponent(); }
+        public PostMaker() { InitializeComponent(); SidebarHelper.Init(this, SidebarHelper.ActivePage.Aanmaken);
+            // Direct instellen na InitializeComponent zodat het altijd werkt
+            Loaded += (_, _) => LaadSidebarProfiel();
+        }
+
+        private void LaadSidebarProfiel()
+        {
+            var user = AppState.Instance.HuidigeGebruiker;
+            if (user == null) return;
+
+            SideNaamLabel.Text = string.IsNullOrWhiteSpace(user.Username) ? user.VolledigeNaam : user.Username;
+
+            var bmp = ImageHelper.LaadGeschaald(user.ProfielFotoPad, 64);
+            if (bmp != null)
+            {
+                SideAvatarImg.Source = bmp;
+                SideAvatarBg.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                SideAvatarBg.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 0));
+                SideAvatarBg.Visibility = System.Windows.Visibility.Visible;
+                SideAvatarImg.Source = null;
+                // Toon eerste letter als fallback (via AvatarHelper kan niet in Ellipse, dus zet bg oranje)
+            }
+
+            bool isAdmin = user.IsAdmin || user.Role == "Admin";
+            if (BtnAdmin != null) BtnAdmin.Visibility = isAdmin ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
 
         private void OnAfbeeldingClick(object sender, RoutedEventArgs e)
         {
@@ -79,6 +107,14 @@ namespace MoreConnector.Views
         private void OnPostDelenClick(object sender, RoutedEventArgs e)
         {
             string beschrijving = BeschrijvingInput.Text.Trim();
+
+            var contentFout = Models.UsernameValidator.ValideerContent(beschrijving);
+            if (contentFout != null)
+            {
+                MessageBox.Show(contentFout, "Ongepaste inhoud",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
             if (string.IsNullOrEmpty(beschrijving))
             {
                 MessageBox.Show("Voer een beschrijving in.", "Validatie");
@@ -111,9 +147,6 @@ namespace MoreConnector.Views
                 ? new System.Windows.Media.SolidColorBrush(System.Windows.Media.Colors.Tomato)
                 : new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(170,170,170));
         }
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());

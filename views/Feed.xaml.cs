@@ -84,10 +84,7 @@ namespace MoreConnector.Views
 
             // Auteur rij
             var auteurRij = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 8) };
-            var avatarGrid = new Grid { Width = 36, Height = 36, Margin = new Thickness(0, 0, 10, 0) };
-            var avatarEllipse = new Ellipse { Width = 36, Height = 36, Fill = new SolidColorBrush(Color.FromRgb(217, 217, 217)) };
-
-            // Profielfoto: match op UserId (betrouwbaarder dan naam)
+            // Profielfoto auteur: match op UserId
             var eigenUser = _state.HuidigeGebruiker;
             string auteurFoto = "";
             foreach (var g in _state.Gebruikers)
@@ -95,11 +92,8 @@ namespace MoreConnector.Views
             if (string.IsNullOrEmpty(auteurFoto) && eigenUser?.Id == post.UserId)
                 auteurFoto = eigenUser.ProfielFotoPad;
 
-            var bmpAuteur = ImageHelper.LaadGeschaald(auteurFoto, 72);
-            if (bmpAuteur != null)
-                avatarEllipse.Fill = new ImageBrush { ImageSource = bmpAuteur, Stretch = Stretch.UniformToFill };
-
-            avatarGrid.Children.Add(avatarEllipse);
+            var avatarGrid = Models.AvatarHelper.Bouw(auteurFoto, post.AuteurNaam, 36);
+            avatarGrid.Margin = new Thickness(0, 0, 10, 0);
             auteurRij.Children.Add(avatarGrid);
             auteurRij.Children.Add(new TextBlock
             {
@@ -170,8 +164,6 @@ namespace MoreConnector.Views
             links.Children.Add(captBorder);
             links.Children.Add(BouwLikesBalk(post));
             rootGrid.Children.Add(links);
-
-            // ── RECHTS: reacties met scrollbalk ──────────────────────────
             var rechts = new StackPanel { Margin = new Thickness(24, 0, 0, 0), VerticalAlignment = VerticalAlignment.Top };
             Grid.SetColumn(rechts, 1);
 
@@ -251,11 +243,10 @@ namespace MoreConnector.Views
             var stack = new StackPanel { Margin = new Thickness(reactie.IsReply ? 24 : 0, 0, 0, 10) };
             var header = new StackPanel { Orientation = Orientation.Horizontal, Margin = new Thickness(0, 0, 0, 2) };
 
-            var ell = new Ellipse { Width = 30, Height = 30, Margin = new Thickness(0, 0, 8, 0) };
             string commentFoto = "";
             var eu = _state.HuidigeGebruiker;
             foreach (var g in _state.Gebruikers)
-                if (g.VolledigeNaam == reactie.AuteurNaam || g.DisplayNaam == reactie.AuteurNaam)
+                if (g.VolledigeNaam == reactie.AuteurNaam || g.DisplayNaam == reactie.AuteurNaam || g.Username == reactie.AuteurNaam)
                 { commentFoto = g.ProfielFotoPad; break; }
             if (string.IsNullOrEmpty(commentFoto) && !string.IsNullOrEmpty(reactie.AuteurFotoPad))
                 commentFoto = reactie.AuteurFotoPad;
@@ -263,11 +254,8 @@ namespace MoreConnector.Views
                 (eu.VolledigeNaam == reactie.AuteurNaam || eu.DisplayNaam == reactie.AuteurNaam))
                 commentFoto = eu.ProfielFotoPad;
 
-            var bmpR = ImageHelper.LaadGeschaald(commentFoto, 60);
-            ell.Fill = bmpR != null
-                ? new ImageBrush { ImageSource = bmpR, Stretch = Stretch.UniformToFill }
-                : new SolidColorBrush(Color.FromRgb(217, 217, 217));
-
+            var ell = Models.AvatarHelper.Bouw(commentFoto, reactie.AuteurNaam, 30);
+            ell.Margin = new Thickness(0, 0, 8, 0);
             header.Children.Add(ell);
             header.Children.Add(new TextBlock
             {
@@ -297,23 +285,40 @@ namespace MoreConnector.Views
             var btn = new Button { Background = Brushes.Transparent, BorderThickness = new Thickness(0), Cursor = Cursors.Hand, Padding = new Thickness(0) };
             var txt = new TextBlock { FontSize = 12, VerticalAlignment = VerticalAlignment.Center };
 
-            void Refresh()
+            int userId = _state.HuidigeGebruiker?.Id ?? 0;
+
+            // Laad initiële staat uit DB
+            bool isLiked = false;
+            int likeCount = 0;
+            if (reactie.DbCommentId > 0 && userId > 0)
             {
-                bool liked = reactie.LikedDoor.Contains(_state.HuidigeGebruiker?.DisplayNaam ?? "");
-                txt.Text = liked ? $"❤️ {reactie.LikedDoor.Count}" : $"🤍 {reactie.LikedDoor.Count}";
+                try
+                {
+                    isLiked   = CommentRepository.IsLikedByUser(reactie.DbCommentId, userId);
+                    likeCount = CommentRepository.GetLikeCount(reactie.DbCommentId);
+                }
+                catch { }
+            }
+
+            void Refresh(bool liked, int count)
+            {
+                txt.Text = liked ? $"❤️ {count}" : $"🤍 {count}";
                 txt.Foreground = liked
                     ? new SolidColorBrush(Color.FromRgb(255, 80, 80))
                     : new SolidColorBrush(Color.FromRgb(150, 160, 170));
             }
-            Refresh();
+
+            Refresh(isLiked, likeCount);
             btn.Content = txt;
+
             btn.Click += (_, _) =>
             {
-                string naam = _state.HuidigeGebruiker?.DisplayNaam ?? "";
-                if (reactie.LikedDoor.Contains(naam)) reactie.LikedDoor.Remove(naam);
-                else reactie.LikedDoor.Add(naam);
-                Refresh();
+                if (reactie.DbCommentId <= 0 || userId <= 0) return;
+                bool nowLiked = CommentRepository.ToggleLike(reactie.DbCommentId, userId);
+                int newCount  = CommentRepository.GetLikeCount(reactie.DbCommentId);
+                Refresh(nowLiked, newCount);
             };
+
             row.Children.Add(btn);
             return row;
         }
@@ -351,16 +356,23 @@ namespace MoreConnector.Views
                 string tekst = textBox.Text.Trim();
                 if (string.IsNullOrEmpty(tekst) || tekst == "Schrijf een reactie...") return;
 
+                var contentFout = Models.UsernameValidator.ValideerContent(tekst);
+                if (contentFout != null)
+                {
+                    System.Windows.MessageBox.Show(contentFout, "Ongepaste inhoud",
+                        System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Warning);
+                    return;
+                }
+
                 var user  = _state.HuidigeGebruiker;
-                string naam = user?.DisplayNaam ?? "Onbekend";
+                // Altijd username gebruiken, niet de echte naam
+                string naam = (!string.IsNullOrWhiteSpace(user?.Username)) ? user!.Username : (user?.VolledigeNaam ?? "Onbekend");
                 string foto = user?.ProfielFotoPad ?? "";
                 var nu = System.DateTime.Now;
 
                 int commentId = 0;
                 if (user != null && user.Id > 0 && post.DbId > 0)
                     try { commentId = CommentRepository.Toevoegen(post.DbId, user.Id, tekst); } catch { }
-
-                // FIX: NIET aan post.Reacties toevoegen — alleen aan UI panel
                 // Dit voorkomt dubbele weergave bij herladen
                 var nieuwBlok = BouwReactieBlok(new FeedReactie
                 {

@@ -1,3 +1,4 @@
+using System.Windows.Media.Imaging;
 using MoreConnector.Database;
 using MoreConnector.Models;
 using System.Collections.Generic;
@@ -14,7 +15,6 @@ namespace MoreConnector.Views
     {
         private readonly AppState _state = AppState.Instance;
         private List<User> _alleGebruikers = new();
-        // FIX: bijhouden welke requests lokaal verstuurd zijn (reset niet bij tab-switch)
         private readonly System.Collections.Generic.HashSet<int> _verzondenRequests = new();
 
         public GebruikersPage()
@@ -83,12 +83,12 @@ namespace MoreConnector.Views
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
             // Avatar
-            var avatarGrid = new Grid { Width = 52, Height = 52, Margin = new Thickness(0, 0, 16, 0) };
-            var avatarEll  = new Ellipse { Width = 52, Height = 52, Fill = new SolidColorBrush(Color.FromRgb(255, 140, 0)) };
-            avatarGrid.Children.Add(avatarEll);
+            var avatarGrid = Models.AvatarHelper.Bouw(user.ProfielFotoPad, user.Firstname, 52);
+            avatarGrid.Margin = new Thickness(0, 0, 16, 0);
+            // dummy initiaal voor code below (nodig voor grid.Children.Add)
             var initiaal = new TextBlock
             {
-                Text                = user.Firstname.Length > 0 ? user.Firstname[0].ToString().ToUpper() : "?",
+                Text                = "",
                 Foreground          = new SolidColorBrush(Colors.White),
                 FontSize            = 22, FontWeight = FontWeights.Bold,
                 HorizontalAlignment = HorizontalAlignment.Center,
@@ -133,7 +133,6 @@ namespace MoreConnector.Views
             // Vriendknop
             if (eigenId > 0)
             {
-                // FIX: check ook de lokale cache zodat de knop niet reset bij tab-switch
                 if (status == "none" && _verzondenRequests.Contains(user.Id))
                     status = "pending";
 
@@ -146,7 +145,7 @@ namespace MoreConnector.Views
                         {
                             try { FriendshipRepository.StuurVerzoek(eigenId, user.Id); }
                             catch { }
-                            _verzondenRequests.Add(user.Id);  // FIX: bewaar in locale cache
+                            _verzondenRequests.Add(user.Id);
                             vriendenBtn.Content = "✓ Verzonden";
                             vriendenBtn.IsEnabled = false;
                             vriendenBtn.Background = new SolidColorBrush(Color.FromRgb(80, 80, 80));
@@ -231,6 +230,7 @@ namespace MoreConnector.Views
         private void SideNav_Activiteiten(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new ActivityPage());
         private void SideNav_Berichten(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
+        private void SideNav_Notificaties(object sender, RoutedEventArgs e)  => Nav().AuthFrame.Navigate(new NotificatiePage());
         private void SideNav_Aanmaken(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void SideNav_Profiel(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
         private void SideNav_Admin(object sender, RoutedEventArgs e)        => Nav().AuthFrame.Navigate(new AdminPage());

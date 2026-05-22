@@ -19,13 +19,61 @@ namespace MoreConnector.Views
             SidebarHelper.Init(this, SidebarHelper.ActivePage.Activiteiten);
             SearchBox.Text = "zoek activiteiten...";
 
-            // FIX: Goedemiddag naam instellen
             var user = _state.HuidigeGebruiker;
             if (user != null && UsernameText != null)
                 UsernameText.Text = string.IsNullOrWhiteSpace(user.Username) ? user.Voornaam : user.Username;
 
+            // Topbar profielfoto laden
+            Loaded += (_, _) => LaadTopbarAvatar();
+
             _state.Evenementen.CollectionChanged += (_, _) => HerlaadActiviteiten();
             HerlaadActiviteiten();
+        }
+
+        private void LaadTopbarAvatar()
+        {
+            var user = _state.HuidigeGebruiker;
+            if (user == null) return;
+            var bmp = ImageHelper.LaadGeschaald(user.ProfielFotoPad, 96);
+            if (bmp == null) return;
+
+            // Zoek Image en Ellipse in de visual tree
+            PasTopbarAvatarToe(bmp);
+        }
+
+        private void PasTopbarAvatarToe(System.Windows.Media.Imaging.BitmapSource bmp)
+        {
+            // Zoek alle Images in de visual tree van de pagina — pak de topbar avatar
+            var allImages = FindAllVisualChildren<System.Windows.Controls.Image>(this);
+            foreach (var img in allImages)
+            {
+                if (img.Name == "TopbarAvatarImg" || img.Width == 48)
+                {
+                    img.Source = bmp;
+                    break;
+                }
+            }
+            var allEllipses = FindAllVisualChildren<System.Windows.Shapes.Ellipse>(this);
+            foreach (var ell in allEllipses)
+            {
+                if (ell.Width == 48 && ell.Height == 48)
+                {
+                    ell.Visibility = System.Windows.Visibility.Collapsed;
+                    break;
+                }
+            }
+        }
+
+        private static System.Collections.Generic.List<T> FindAllVisualChildren<T>(System.Windows.DependencyObject parent) where T : System.Windows.DependencyObject
+        {
+            var list = new System.Collections.Generic.List<T>();
+            for (int i = 0; i < System.Windows.Media.VisualTreeHelper.GetChildrenCount(parent); i++)
+            {
+                var child = System.Windows.Media.VisualTreeHelper.GetChild(parent, i);
+                if (child is T t) list.Add(t);
+                list.AddRange(FindAllVisualChildren<T>(child));
+            }
+            return list;
         }
 
         private void HerlaadActiviteiten()
@@ -44,8 +92,6 @@ namespace MoreConnector.Views
                     !ev.Locatie.ToLower().Contains(zoek) &&
                     !ev.Beschrijving.ToLower().Contains(zoek))
                     continue;
-
-                // FIX: check via CreatorId (betrouwbaarder dan naam, werkt na logout/login)
                 int huidigeId = _state.HuidigeGebruiker?.Id ?? 0;
                 bool kanBeheren = (huidigeId > 0 && ev.CreatorId == huidigeId) ||
                                   ev.Auteur == huidigeAuteur || _state.IsAdmin;
@@ -82,12 +128,11 @@ namespace MoreConnector.Views
             var grid = new Grid();
             grid.RowDefinitions.Add(new RowDefinition { Height = new GridLength(160) }); // vaste hoogte voor afbeelding
             grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-
-            // ── Afbeelding of placeholder ─────────────────────────────────
             var imgBorder = new Border
             {
                 CornerRadius = new CornerRadius(12, 12, 0, 0),
-                ClipToBounds = true
+                ClipToBounds = true,
+                Height       = 160   // vaste hoogte → afbeelding wordt gecropped
             };
 
             if (!string.IsNullOrEmpty(ev.AfbeeldingPad))
@@ -97,8 +142,10 @@ namespace MoreConnector.Views
                 {
                     var img = new System.Windows.Controls.Image
                     {
-                        Source  = bmp,
-                        Stretch = Stretch.UniformToFill
+                        Source              = bmp,
+                        Stretch             = Stretch.UniformToFill,
+                        HorizontalAlignment = HorizontalAlignment.Center,
+                        VerticalAlignment   = VerticalAlignment.Center
                     };
                     System.Windows.Media.RenderOptions.SetBitmapScalingMode(img, System.Windows.Media.BitmapScalingMode.HighQuality);
                     imgBorder.Child = img;
@@ -123,8 +170,6 @@ namespace MoreConnector.Views
 
             Grid.SetRow(imgBorder, 0);
             grid.Children.Add(imgBorder);
-
-            // ── Beheer knoppen (bewerken + verwijderen) ────────────────────
             if (kanBeheren)
             {
                 var btnPanel = new StackPanel
@@ -174,8 +219,6 @@ namespace MoreConnector.Views
                 Grid.SetRow(btnPanel, 0);
                 grid.Children.Add(btnPanel);
             }
-
-            // ── Info balk ─────────────────────────────────────────────────
             var infoBalk = new Border
             {
                 Background   = new SolidColorBrush(Color.FromRgb(255, 140, 0)),

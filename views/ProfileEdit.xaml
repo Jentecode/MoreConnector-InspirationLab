@@ -259,7 +259,7 @@
                              Style="{StaticResource InputStyle}"
                              Margin="0,0,0,16"/>
 
-                    <TextBlock Text="Email" Style="{StaticResource LabelStyle}"/>
+                    <TextBlock Text="E-mailadres" Style="{StaticResource LabelStyle}"/>
                     <TextBox x:Name="EmailInput"
                              Style="{StaticResource InputStyle}"
                              Margin="0,0,0,16"/>
@@ -359,35 +359,6 @@
                              Style="{StaticResource BioInputStyle}"
                              Height="160"
                              Margin="0,0,0,24"/>
-
-                    <!-- Tags / interesses -->
-                    <TextBlock Text="Interesses &amp; Tags"
-                               Foreground="White" FontSize="15" FontWeight="SemiBold"
-                               Margin="0,0,0,10"/>
-                    <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-                        <Border Background="#1E2E40" CornerRadius="8" Padding="2">
-                            <TextBox x:Name="TagInput"
-                                     Background="Transparent" BorderThickness="0"
-                                     Foreground="White" FontSize="13"
-                                     Padding="10,6" MinWidth="140"
-                                     VerticalContentAlignment="Center"/>
-                        </Border>
-                        <Button Content="+ Voeg toe"
-                                x:Name="TagToevoegenBtn"
-                                Background="#FF8C00" Foreground="White"
-                                FontSize="13" BorderThickness="0"
-                                Padding="10,6" Margin="8,0,0,0" Cursor="Hand"
-                                Click="OnTagToevoegen">
-                            <Button.Template>
-                                <ControlTemplate TargetType="Button">
-                                    <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
-                                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                    </Border>
-                                </ControlTemplate>
-                            </Button.Template>
-                        </Button>
-                    </StackPanel>
-                    <WrapPanel x:Name="TagsPanel" Margin="0,0,0,24"/>
 
                     <!-- Account verwijderen -->
                     <Button x:Name="AccountVerwijderenButton"

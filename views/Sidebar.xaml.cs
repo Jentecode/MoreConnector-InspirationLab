@@ -69,8 +69,6 @@ namespace MoreConnector.Views
                 AvatarAchtergrond.Visibility = Visibility.Visible;
             }
         }
-
-        // ── Navigatie ────────────────────────────────────────────────────────
         private void OnHome(object sender, RoutedEventArgs e)         => Nav().AuthFrame.Navigate(new Feed());
         private void OnActiviteiten(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new ActivityPage());
         private void OnBerichten(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());

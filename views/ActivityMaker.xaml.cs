@@ -13,7 +13,35 @@ namespace MoreConnector.Views
         private readonly List<string> _tags = new();
         private readonly AppState _state = AppState.Instance;
 
-        public ActivityMaker() { InitializeComponent(); }
+        public ActivityMaker() { InitializeComponent(); SidebarHelper.Init(this, SidebarHelper.ActivePage.Aanmaken);
+            // Direct instellen na InitializeComponent zodat het altijd werkt
+            Loaded += (_, _) => LaadSidebarProfiel();
+        }
+
+        private void LaadSidebarProfiel()
+        {
+            var user = AppState.Instance.HuidigeGebruiker;
+            if (user == null) return;
+
+            SideNaamLabel.Text = string.IsNullOrWhiteSpace(user.Username) ? user.VolledigeNaam : user.Username;
+
+            var bmp = ImageHelper.LaadGeschaald(user.ProfielFotoPad, 64);
+            if (bmp != null)
+            {
+                SideAvatarImg.Source = bmp;
+                SideAvatarBg.Visibility = System.Windows.Visibility.Collapsed;
+            }
+            else
+            {
+                SideAvatarBg.Fill = new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(255, 140, 0));
+                SideAvatarBg.Visibility = System.Windows.Visibility.Visible;
+                SideAvatarImg.Source = null;
+                // Toon eerste letter als fallback (via AvatarHelper kan niet in Ellipse, dus zet bg oranje)
+            }
+
+            bool isAdmin = user.IsAdmin || user.Role == "Admin";
+            if (BtnAdmin != null) BtnAdmin.Visibility = isAdmin ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
 
         private void OnAanmakenBevestigenClick(object sender, RoutedEventArgs e)
         {
@@ -26,6 +54,15 @@ namespace MoreConnector.Views
             if (string.IsNullOrEmpty(naam) || string.IsNullOrEmpty(locatie))
             {
                 MessageBox.Show("Vul minstens een naam en locatie in.", "Validatie");
+                return;
+            }
+
+            // Check ongepaste inhoud
+            if (!Models.UsernameValidator.IsGeldigeContent(naam) ||
+                !Models.UsernameValidator.IsGeldigeContent(beschrijving))
+            {
+                MessageBox.Show("De naam of beschrijving bevat ongepaste inhoud.", "Ongepaste inhoud",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 

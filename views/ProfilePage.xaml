@@ -217,14 +217,6 @@
                         </Button.Template>
                     </Button>
 
-                    <!-- Interesses -->
-                    <TextBlock Text="Interesses"
-                               Foreground="{StaticResource WhiteBrush}"
-                               FontSize="15" FontWeight="SemiBold"
-                               Margin="0,0,0,12"/>
-
-                    <WrapPanel x:Name="InteressesPanel" Orientation="Horizontal"/>
-
                 </StackPanel>
             </Border>
 
@@ -249,17 +241,32 @@
                         </ItemsControl.ItemsPanel>
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Border Background="{StaticResource LightGrayBrush}"
-                                        CornerRadius="12" Margin="0,0,12,12" MinHeight="130">
+                                <Border CornerRadius="12" Margin="0,0,12,12"
+                                        ClipToBounds="True" MaxWidth="280">
                                     <Grid>
                                         <Grid.RowDefinitions>
-                                            <RowDefinition Height="*"/>
+                                            <RowDefinition Height="160"/>
                                             <RowDefinition Height="Auto"/>
                                         </Grid.RowDefinitions>
 
+                                        <!-- Foto gecropped in kader -->
+                                        <Border Grid.Row="0" ClipToBounds="True">
+                                            <Image Source="{Binding FotoBron}"
+                                                   Stretch="UniformToFill"
+                                                   HorizontalAlignment="Center"
+                                                   VerticalAlignment="Center"
+                                                   Visibility="{Binding FotoVisibility}"/>
+                                        </Border>
+                                        <!-- Placeholder als geen foto -->
+                                        <Border Grid.Row="0" Background="{StaticResource LightGrayBrush}"
+                                                Visibility="{Binding PlaceholderVisibility}">
+                                            <TextBlock Text="🎉" FontSize="40"
+                                                       HorizontalAlignment="Center"
+                                                       VerticalAlignment="Center"/>
+                                        </Border>
+
                                         <Border Grid.Row="1"
                                                 Background="{StaticResource OrangeBrush}"
-                                                CornerRadius="0,0,12,12"
                                                 Padding="10,8"
                                                 Visibility="{Binding InfoVisibility}">
                                             <StackPanel>
@@ -284,38 +291,9 @@
                                FontSize="18" FontWeight="Bold"
                                Margin="0,16,0,12"/>
 
-                    <ItemsControl x:Name="ConnectiesPanel">
-                        <ItemsControl.ItemTemplate>
-                            <DataTemplate>
-                                <Border Background="{StaticResource CardBrush}"
-                                        CornerRadius="10" Padding="12,10" Margin="0,0,0,8">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                            <ColumnDefinition Width="Auto"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Ellipse Grid.Column="0" Style="{StaticResource SmallAvatarStyle}" Margin="0,0,12,0"/>
-
-                                        <TextBlock Grid.Column="1"
-                                                   Text="{Binding Naam}"
-                                                   Foreground="{StaticResource WhiteBrush}"
-                                                   FontSize="14" FontWeight="SemiBold"
-                                                   VerticalAlignment="Center"/>
-
-                                        <Border Grid.Column="2"
-                                                Background="{StaticResource OrangeBrush}"
-                                                CornerRadius="8" Padding="14,4">
-                                            <TextBlock Text="{Binding Status}"
-                                                       Foreground="{StaticResource WhiteBrush}"
-                                                       FontSize="12"/>
-                                        </Border>
-                                    </Grid>
-                                </Border>
-                            </DataTemplate>
-                        </ItemsControl.ItemTemplate>
-                    </ItemsControl>
+                    <!-- ConnectiesPanel via code-behind (met foto + unfriend) -->
+                    <ItemsControl x:Name="ConnectiesPanel" Visibility="Collapsed"/>
+                    <StackPanel x:Name="ConnectiesBouwPanel"/>
 
                 </StackPanel>
             </ScrollViewer>

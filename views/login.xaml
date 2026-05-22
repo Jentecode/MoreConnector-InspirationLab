@@ -63,7 +63,7 @@
                            Margin="0,4,0,24"/>
 
                 <!-- Username label -->
-                <TextBlock Text="Voer je gebruikersnaam in"
+                <TextBlock Text="Voer je e-mailadres in"
                            FontSize="12"
                            Foreground="#333333"
                            Margin="0,0,0,6"/>
@@ -75,7 +75,7 @@
                         Margin="0,0,0,16">
 
                     <TextBox x:Name="TxtUsername"
-                             Text="gebruikersnaam"
+                             Text="e-mailadres"
                              Foreground="Gray"
                              BorderThickness="0"
                              Padding="10,8"

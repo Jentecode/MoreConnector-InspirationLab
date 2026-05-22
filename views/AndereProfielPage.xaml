@@ -115,8 +115,6 @@
                             <TextBlock x:Name="UsernameTekst" Foreground="{StaticResource OrangeBrush}" FontSize="15" Margin="0,0,0,4"/>
                             <TextBlock x:Name="StudieTekst" Foreground="#8899AA" FontSize="13" Margin="0,0,0,8"/>
                             <TextBlock x:Name="BioTekst" Foreground="#CCCCCC" FontSize="13" TextWrapping="Wrap" Margin="0,0,0,16"/>
-                            <!-- Tags -->
-                            <WrapPanel x:Name="TagsPanel"/>
                         </StackPanel>
                         <!-- Vriendknop -->
                         <StackPanel Grid.Column="2" VerticalAlignment="Top" Margin="16,0,0,0">
@@ -136,29 +134,10 @@
                                     </ControlTemplate>
                                 </Button.Template>
                             </Button>
-                            <Button x:Name="BerichtBtn" Content="💬  Bericht sturen"
-                                    Background="#1B3A55" Foreground="White"
-                                    BorderThickness="0" Padding="16,10" FontSize="13" FontWeight="SemiBold"
-                                    Cursor="Hand" Click="OnBerichtSturen">
-                                <Button.Template>
-                                    <ControlTemplate TargetType="Button">
-                                        <Border Background="{TemplateBinding Background}" CornerRadius="8" Padding="{TemplateBinding Padding}">
-                                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                                        </Border>
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsMouseOver" Value="True"><Setter Property="Background" Value="#0F2A40"/></Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Button.Template>
-                            </Button>
                         </StackPanel>
                     </Grid>
                 </Border>
-                <!-- Posts van deze gebruiker -->
                 <StackPanel Grid.Row="2">
-                    <TextBlock Text="Posts" Foreground="White" FontSize="18" FontWeight="Bold" Margin="0,0,0,16"/>
-                    <StackPanel x:Name="PostsPanel"/>
-
                     <!-- Activiteiten -->
                     <TextBlock Text="Activiteiten"
                                Foreground="White" FontSize="15" FontWeight="SemiBold"

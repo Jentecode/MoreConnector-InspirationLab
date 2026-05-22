@@ -56,6 +56,7 @@
                 <Button x:Name="BtnActiviteiten" Content="🎉  Activiteiten" Style="{StaticResource SideNavBtn}" Click="SideNav_Activiteiten"/>
                 <Button x:Name="BtnBerichten"    Content="💬  Berichten"    Style="{StaticResource SideNavBtn}" Click="SideNav_Berichten"/>
                 <Button x:Name="BtnGebruikers"   Content="👥  Gebruikers"   Style="{StaticResource SideNavBtn}" Click="SideNav_Gebruikers" Background="#993D00"/>
+                <Button x:Name="BtnNotificaties" Content="🔔  Notificaties" Style="{StaticResource SideNavBtn}" Click="SideNav_Notificaties"/>
                 <Button x:Name="BtnAanmaken"     Content="✏️  Aanmaken"     Style="{StaticResource SideNavBtn}" Click="SideNav_Aanmaken"/>
                 <Button x:Name="BtnAdmin"        Content="🛡️  Beheer"       Style="{StaticResource SideNavBtn}" Click="SideNav_Admin" Visibility="Collapsed"/>
             </StackPanel>

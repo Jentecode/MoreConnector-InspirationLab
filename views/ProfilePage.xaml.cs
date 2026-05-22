@@ -1,3 +1,5 @@
+using System.Windows.Input;
+using MoreConnector.Database;
 using MoreConnector.Models;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -22,7 +24,7 @@ namespace MoreConnector.Views
 
             LaadProfielData();
             LaadMijnActiviteiten();
-            LaadInteresses();
+            LaadConnecties();
         }
 
         private void LaadProfielData()
@@ -54,33 +56,72 @@ namespace MoreConnector.Views
             string auteur = _state.HuidigeGebruiker?.DisplayNaam ?? "";
             MijnActiviteiten.Clear();
             foreach (var ev in _state.Evenementen.Where(e => e.Auteur == auteur))
-                MijnActiviteiten.Add(new ProfielActiviteit { Titel = $"{ev.Naam} – {ev.DatumTekst}", Locatie = ev.Locatie });
+                MijnActiviteiten.Add(new ProfielActiviteit { Titel = $"{ev.Naam} – {ev.DatumTekst}", Locatie = ev.Locatie, FotoPad = ev.AfbeeldingPad });
         }
 
-        private void LaadInteresses()
+        private void LaadConnecties()
         {
-            InteressesPanel.Children.Clear();
-            var user = _state.HuidigeGebruiker;
-            var tags = user?.Tags.Count > 0
-                ? user.Tags
-                : new System.Collections.Generic.List<string> { "Sport", "Muziek", "IT" };
-
-            foreach (var tag in tags)
+            // Bouw connecties dynamisch (met foto + unfriend knop)
+            ConnectiesPanel.ItemsSource = null;
+            ConnectiesBouwPanel.Children.Clear();
+            int eigenId = _state.HuidigeGebruiker?.Id ?? 0;
+            if (eigenId == 0) return;
+            try
             {
-                InteressesPanel.Children.Add(new Border
+                var vrienden = FriendshipRepository.GetVrienden(eigenId);
+                foreach (var v in vrienden)
                 {
-                    Background  = new SolidColorBrush(Color.FromRgb(204, 82, 0)),
-                    CornerRadius = new CornerRadius(12),
-                    Padding     = new Thickness(14, 6, 14, 6),
-                    Margin      = new Thickness(0, 0, 8, 8),
-                    Child       = new TextBlock
+                    var kaart = new Border
                     {
-                        Text       = $"#{tag}",
-                        Foreground = new SolidColorBrush(Colors.White),
-                        FontSize   = 13
-                    }
-                });
+                        Background = new SolidColorBrush(Color.FromRgb(30, 46, 64)),
+                        CornerRadius = new CornerRadius(10), Padding = new Thickness(12, 10, 12, 10),
+                        Margin = new Thickness(0, 0, 0, 8)
+                    };
+                    var grid = new System.Windows.Controls.Grid();
+                    grid.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = System.Windows.GridLength.Auto });
+                    grid.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = new System.Windows.GridLength(1, System.Windows.GridUnitType.Star) });
+                    grid.ColumnDefinitions.Add(new System.Windows.Controls.ColumnDefinition { Width = System.Windows.GridLength.Auto });
+
+                    var ell = new System.Windows.Shapes.Ellipse { Width = 40, Height = 40, Margin = new Thickness(0, 0, 12, 0) };
+                    var bmpV = ImageHelper.LaadGeschaald(v.ProfielFotoPad, 80);
+                    ell.Fill = bmpV != null
+                        ? (System.Windows.Media.Brush)new ImageBrush { ImageSource = bmpV, Stretch = Stretch.UniformToFill }
+                        : new SolidColorBrush(Color.FromRgb(255, 140, 0));
+                    System.Windows.Controls.Grid.SetColumn(ell, 0);
+                    grid.Children.Add(ell);
+
+                    var naam = new TextBlock
+                    {
+                        Text = string.IsNullOrWhiteSpace(v.Username) ? v.VolledigeNaam : v.Username,
+                        Foreground = new SolidColorBrush(Colors.White), FontSize = 14,
+                        FontWeight = FontWeights.SemiBold, VerticalAlignment = VerticalAlignment.Center
+                    };
+                    System.Windows.Controls.Grid.SetColumn(naam, 1);
+                    grid.Children.Add(naam);
+
+                    var user = v; // capture voor closure
+                    var unfriendBtn = new Button
+                    {
+                        Content = "Ontvriend", Background = new SolidColorBrush(Color.FromRgb(100, 30, 30)),
+                        Foreground = new SolidColorBrush(Colors.White), BorderThickness = new Thickness(0),
+                        Padding = new Thickness(10, 4, 10, 4), Cursor = Cursors.Hand, FontSize = 12
+                    };
+                    unfriendBtn.Click += (_, _) =>
+                    {
+                        var r2 = MessageBox.Show($"Vriend {user.VolledigeNaam} verwijderen?", "Ontvrienden",
+                            MessageBoxButton.YesNo, MessageBoxImage.Question);
+                        if (r2 != MessageBoxResult.Yes) return;
+                        try { FriendshipRepository.VerwijderVriendschap(eigenId, user.Id); } catch { }
+                        ConnectiesBouwPanel.Children.Remove(kaart);
+                    };
+                    System.Windows.Controls.Grid.SetColumn(unfriendBtn, 2);
+                    grid.Children.Add(unfriendBtn);
+
+                    kaart.Child = grid;
+                    ConnectiesBouwPanel.Children.Add(kaart);
+                }
             }
+            catch { }
         }
 
         private void OnProfielBewerkenClick(object sender, RoutedEventArgs e)
@@ -91,9 +132,6 @@ namespace MoreConnector.Views
         private void OnBerichtenClick(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void OnAanmakenClick(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void OnProfielClick(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());
@@ -121,7 +159,12 @@ namespace MoreConnector.Views
     {
         public string Titel   { get; set; } = "";
         public string Locatie { get; set; } = "";
+        public string FotoPad { get; set; } = "";
         public Visibility InfoVisibility => string.IsNullOrWhiteSpace(Titel) ? Visibility.Collapsed : Visibility.Visible;
+        public System.Windows.Media.ImageSource? FotoBron =>
+            string.IsNullOrWhiteSpace(FotoPad) ? null : ImageHelper.LaadGeschaald(FotoPad, 400);
+        public Visibility FotoVisibility => string.IsNullOrWhiteSpace(FotoPad) ? Visibility.Collapsed : Visibility.Visible;
+        public Visibility PlaceholderVisibility => string.IsNullOrWhiteSpace(FotoPad) ? Visibility.Visible : Visibility.Collapsed;
     }
 
     public class Connectie

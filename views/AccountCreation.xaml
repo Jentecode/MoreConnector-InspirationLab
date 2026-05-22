@@ -78,9 +78,9 @@
                 </Border>
 
                 <!-- Email -->
-                <TextBlock Text="email-adres" FontSize="12" Foreground="#333333" Margin="0,0,0,6"/>
+                <TextBlock Text="e-mailadres" FontSize="12" Foreground="#333333" Margin="0,0,0,6"/>
                 <Border BorderBrush="#4A90D9" BorderThickness="1.5" CornerRadius="6" Margin="0,0,0,14">
-                    <TextBox x:Name="TxtEmail" Text="email-adres" Foreground="Gray"
+                    <TextBox x:Name="TxtEmail" Text="e-mailadres" Foreground="Gray"
                              BorderThickness="0" Padding="10,8" FontSize="13" Background="Transparent"
                              GotFocus="TxtEmail_GotFocus" LostFocus="TxtEmail_LostFocus"/>
                 </Border>

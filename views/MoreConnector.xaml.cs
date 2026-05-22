@@ -21,6 +21,7 @@ namespace MoreConnector.Views
 
         public void NavigateToCreateAccount() => AuthFrame.Navigate(new AccountCreation());
         public void NavigateToPasswordReset() => AuthFrame.Navigate(new PasswordReset());
+        public void NavigateToEmailVerification(string email) => AuthFrame.Navigate(new EmailVerification(email));
         public void NavigateToLogin()         => AuthFrame.Navigate(new Login());
         public void NavigateToFeed()          => AuthFrame.Navigate(new Feed());
         public void NavigateToProfile()       => AuthFrame.Navigate(new ProfilePage());

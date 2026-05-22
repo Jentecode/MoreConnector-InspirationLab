@@ -44,8 +44,11 @@ namespace MoreConnector.Views
                     var freshEv = EventRepository.GetById(_ev.Id, huidigUser.Id);
                     if (freshEv?.JoinedByMe == true)
                     {
-                        InschrijvenButton.Content   = "✓ Ingeschreven";
-                        InschrijvenButton.IsEnabled = false;
+                        InschrijvenButton.Content    = "✗ Uitschrijven";
+                        InschrijvenButton.Background = new System.Windows.Media.SolidColorBrush(
+                            System.Windows.Media.Color.FromRgb(150, 40, 40));
+                        InschrijvenButton.IsEnabled  = true;
+                        InschrijvenButton.Tag        = "ingeschreven";
                     }
                     if (freshEv?.ParticipantNames != null)
                     {
@@ -91,33 +94,13 @@ namespace MoreConnector.Views
                 Margin       = new Thickness(0, 0, 10, 10)
             };
 
-            // FIX: gebruik een Grid ipv dubbele parent-toewijzing
-            var avatarGrid = new Grid { Width = 32, Height = 32, Margin = new Thickness(0, 0, 8, 0) };
-            var ellipse = new Ellipse { Width = 32, Height = 32, Fill = new SolidColorBrush(Color.FromRgb(255, 140, 0)) };
-            avatarGrid.Children.Add(ellipse);
-
             string fotoPad = "";
             foreach (var g in _state.Gebruikers)
                 if (g.DisplayNaam == naam || g.VolledigeNaam == naam || g.Username == naam.TrimStart('@'))
                 { fotoPad = g.ProfielFotoPad; break; }
 
-            var bmp = ImageHelper.LaadGeschaald(fotoPad, 64);
-            if (bmp != null)
-            {
-                ellipse.Fill = new ImageBrush { ImageSource = bmp, Stretch = Stretch.UniformToFill };
-            }
-            else
-            {
-                // Initiaal tonen
-                avatarGrid.Children.Add(new TextBlock
-                {
-                    Text = naam.Length > 0 ? naam[0].ToString().ToUpper() : "?",
-                    Foreground = new SolidColorBrush(Colors.White),
-                    FontSize = 13, FontWeight = FontWeights.Bold,
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment   = VerticalAlignment.Center
-                });
-            }
+            var avatarGrid = Models.AvatarHelper.Bouw(fotoPad, naam, 32);
+            avatarGrid.Margin = new Thickness(0, 0, 8, 0);
 
             var row = new StackPanel { Orientation = Orientation.Horizontal };
             row.Children.Add(avatarGrid);
@@ -137,24 +120,45 @@ namespace MoreConnector.Views
             if (user == null) return;
             string naam = user.DisplayNaam;
 
-            if (user.Id > 0)
+            bool isIngeschreven = InschrijvenButton.Tag?.ToString() == "ingeschreven";
+
+            if (isIngeschreven)
             {
-                try
+                // Uitschrijven
+                if (user.Id > 0)
+                    try { EventRepository.Uitschrijven(_ev.Id, user.Id); } catch { }
+
+                _ev.Deelnemers.Remove(naam);
+                InschrijvenButton.Content    = "Inschrijven";
+                InschrijvenButton.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(255, 140, 0));
+                InschrijvenButton.Tag        = null;
+            }
+            else
+            {
+                // Inschrijven
+                if (user.Id > 0)
                 {
-                    bool gelukt = EventRepository.Inschrijven(_ev.Id, user.Id);
-                    if (!gelukt)
+                    try
                     {
-                        MessageBox.Show("Je bent al ingeschreven of het maximum aantal deelnemers is bereikt.",
-                            "Inschrijven", MessageBoxButton.OK, MessageBoxImage.Information);
-                        return;
+                        bool gelukt = EventRepository.Inschrijven(_ev.Id, user.Id);
+                        if (!gelukt)
+                        {
+                            MessageBox.Show("Het maximum aantal deelnemers is bereikt.",
+                                "Vol", MessageBoxButton.OK, MessageBoxImage.Information);
+                            return;
+                        }
                     }
+                    catch { }
                 }
-                catch { }
+
+                if (!_ev.Deelnemers.Contains(naam)) _ev.Deelnemers.Add(naam);
+                InschrijvenButton.Content    = "✗ Uitschrijven";
+                InschrijvenButton.Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(150, 40, 40));
+                InschrijvenButton.Tag        = "ingeschreven";
             }
 
-            if (!_ev.Deelnemers.Contains(naam)) _ev.Deelnemers.Add(naam);
-            InschrijvenButton.Content   = "✓ Ingeschreven";
-            InschrijvenButton.IsEnabled = false;
             LaadDeelnemers();
         }
 

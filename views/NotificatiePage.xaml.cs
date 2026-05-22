@@ -54,30 +54,43 @@ namespace MoreConnector.Views
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = new GridLength(1, GridUnitType.Star) });
             grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
 
-            // Avatar
-            var ellipse = new Ellipse
-            {
-                Width  = 48, Height = 48,
-                Fill   = new SolidColorBrush(Color.FromRgb(255, 140, 0)),
-                Margin = new Thickness(0, 0, 16, 0)
-            };
-            Grid.SetColumn(ellipse, 0);
-            grid.Children.Add(ellipse);
+            // Avatar: foto of eerste letter van naam/username
+            var avatarGrid = BouwAvatar(verzoek.Sender.ProfielFotoPad, verzoek.Sender.Firstname, 48);
+            avatarGrid.Margin = new Thickness(0, 0, 16, 0);
+            Grid.SetColumn(avatarGrid, 0);
+            grid.Children.Add(avatarGrid);
 
-            // Info
+            // Info — zelfde opmaak als gebruikerskaart:
+            // oranje = username, wit = echte naam
             var info = new StackPanel { VerticalAlignment = VerticalAlignment.Center };
-            info.Children.Add(new TextBlock
+
+            bool heeftUsername = !string.IsNullOrWhiteSpace(verzoek.Sender.Username);
+
+            if (heeftUsername)
             {
-                Text       = verzoek.Sender.VolledigeNaam,
-                Foreground = new SolidColorBrush(Colors.White),
-                FontSize   = 15, FontWeight = FontWeights.SemiBold
-            });
-            info.Children.Add(new TextBlock
+                info.Children.Add(new TextBlock
+                {
+                    Text       = verzoek.Sender.VolledigeNaam,
+                    Foreground = new SolidColorBrush(Colors.White),
+                    FontSize   = 15, FontWeight = FontWeights.SemiBold
+                });
+                info.Children.Add(new TextBlock
+                {
+                    Text       = $"@{verzoek.Sender.Username}",
+                    Foreground = new SolidColorBrush(Color.FromRgb(255, 140, 0)),
+                    FontSize   = 13
+                });
+            }
+            else
             {
-                Text       = $"@{verzoek.Sender.Username}",
-                Foreground = new SolidColorBrush(Color.FromRgb(255, 140, 0)),
-                FontSize   = 13
-            });
+                // Geen username: echte naam in wit vet
+                info.Children.Add(new TextBlock
+                {
+                    Text       = verzoek.Sender.VolledigeNaam,
+                    Foreground = new SolidColorBrush(Colors.White),
+                    FontSize   = 15, FontWeight = FontWeights.SemiBold
+                });
+            }
             info.Children.Add(new TextBlock
             {
                 Text       = $"Wil je vriend zijn · {verzoek.CreatedAt:d MMM yyyy}",
@@ -119,6 +132,43 @@ namespace MoreConnector.Views
 
             kaart.Child = grid;
             return kaart;
+        }
+        private static Grid BouwAvatar(string fotoPad, string naam, double grootte)
+        {
+            var g = new Grid { Width = grootte, Height = grootte };
+
+            var ell = new Ellipse
+            {
+                Width  = grootte,
+                Height = grootte,
+                Fill   = new SolidColorBrush(Color.FromRgb(255, 140, 0))
+            };
+
+            var bmp = ImageHelper.LaadGeschaald(fotoPad, (int)(grootte * 2));
+            if (bmp != null)
+            {
+                ell.Fill = new ImageBrush { ImageSource = bmp, Stretch = Stretch.UniformToFill };
+            }
+            else
+            {
+                // Altijd de eerste letter tonen
+                string letter = "?";
+                if (!string.IsNullOrWhiteSpace(naam)) letter = naam.TrimStart('@')[0].ToString().ToUpper();
+                g.Children.Add(ell);
+                g.Children.Add(new TextBlock
+                {
+                    Text                = letter,
+                    Foreground          = new SolidColorBrush(Colors.White),
+                    FontSize            = grootte * 0.42,
+                    FontWeight          = FontWeights.Bold,
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment   = VerticalAlignment.Center
+                });
+                return g;
+            }
+
+            g.Children.Add(ell);
+            return g;
         }
 
         private Button MaakKnop(string tekst, Color bg)

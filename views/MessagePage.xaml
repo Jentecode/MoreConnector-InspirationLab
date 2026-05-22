@@ -11,36 +11,32 @@
         <SolidColorBrush x:Key="OrangeBrush"    Color="#FF8C00"/>
         <SolidColorBrush x:Key="NavyBrush"      Color="#1B2A3B"/>
         <SolidColorBrush x:Key="CardBrush"      Color="#1E2E40"/>
-        <SolidColorBrush x:Key="LightGrayBrush" Color="Gray"/>
+        <SolidColorBrush x:Key="LightGrayBrush" Color="#2A3D52"/>
         <SolidColorBrush x:Key="WhiteBrush"     Color="White"/>
-        <SolidColorBrush x:Key="OnlineGreen"    Color="Green"/>
-
-
-
 
         <Style x:Key="ContactButtonStyle" TargetType="Button">
             <Setter Property="Background"                 Value="Transparent"/>
             <Setter Property="BorderThickness"            Value="0"/>
             <Setter Property="Cursor"                     Value="Hand"/>
             <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
-            <Setter Property="Padding"                    Value="8,6"/>
+            <Setter Property="Padding"                    Value="8,8"/>
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border Background="{TemplateBinding Background}"
-                                CornerRadius="6"
+                        <Border Background="{TemplateBinding Background}" CornerRadius="8"
                                 Padding="{TemplateBinding Padding}">
                             <ContentPresenter/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#1E2E40"/>
+                                <Setter Property="Background" Value="#253545"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
+
         <Style x:Key="SideNavBtn" TargetType="Button">
             <Setter Property="Background"                 Value="Transparent"/>
             <Setter Property="Foreground"                 Value="White"/>
@@ -54,8 +50,8 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Button">
-                        <Border x:Name="Bdr" Background="{TemplateBinding Background}"
-                                CornerRadius="6" Padding="{TemplateBinding Padding}">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
                             <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
                                               VerticalAlignment="Center"/>
                         </Border>
@@ -63,18 +59,10 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="#CC5200"/>
                             </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#993D00"/>
-                            </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-        </Style>
-        <Style x:Key="SmallAvatarStyle" TargetType="Ellipse">
-            <Setter Property="Width"  Value="36"/>
-            <Setter Property="Height" Value="36"/>
-            <Setter Property="Fill"   Value="{StaticResource LightGrayBrush}"/>
         </Style>
     </Page.Resources>
 
@@ -92,14 +80,8 @@
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
-
-            <!-- Logo -->
-            <TextBlock Grid.Row="0"
-                       Text="More&#10;Connector"
-                       Foreground="White" FontSize="16" FontWeight="Bold"
-                       TextAlignment="Center" Margin="12,20,12,12" LineHeight="20"/>
-
-            <!-- Nav knoppen -->
+            <TextBlock Grid.Row="0" Text="More&#10;Connector" Foreground="White" FontSize="16"
+                       FontWeight="Bold" TextAlignment="Center" Margin="12,20,12,12" LineHeight="20"/>
             <StackPanel Grid.Row="1" Margin="6,0,6,0">
                 <Button x:Name="BtnHome"         Content="🏠  Home"         Style="{StaticResource SideNavBtn}" Click="SideNav_Home"/>
                 <Button x:Name="BtnActiviteiten" Content="🎉  Activiteiten" Style="{StaticResource SideNavBtn}" Click="SideNav_Activiteiten"/>
@@ -110,8 +92,6 @@
                 <Button x:Name="BtnAdmin"        Content="🛡️  Beheer"       Style="{StaticResource SideNavBtn}" Click="SideNav_Admin"
                         Visibility="Collapsed"/>
             </StackPanel>
-
-            <!-- Profiel + uitloggen -->
             <StackPanel Grid.Row="2" Margin="6,0,6,12">
                 <Button x:Name="BtnProfiel" Style="{StaticResource SideNavBtn}" Click="SideNav_Profiel" Padding="8,8">
                     <StackPanel Orientation="Horizontal">
@@ -123,16 +103,13 @@
                             </Image>
                         </Grid>
                         <StackPanel VerticalAlignment="Center">
-                            <TextBlock x:Name="SideNaamLabel" Text="Profiel"
-                                       Foreground="White" FontSize="13" FontWeight="SemiBold"/>
-                            <TextBlock x:Name="SideRolLabel" Text=""
-                                       Foreground="#FFDDBB" FontSize="11"/>
+                            <TextBlock x:Name="SideNaamLabel" Text="Profiel" Foreground="White" FontSize="13" FontWeight="SemiBold"/>
+                            <TextBlock x:Name="SideRolLabel" Text="" Foreground="#FFDDBB" FontSize="11"/>
                         </StackPanel>
                     </StackPanel>
                 </Button>
-                <Button x:Name="BtnUitloggen" Content="🚪  Uitloggen"
-                        Style="{StaticResource SideNavBtn}" Click="SideNav_Uitloggen"
-                        Foreground="#FFDDBB"/>
+                <Button x:Name="BtnUitloggen" Content="🚪  Uitloggen" Style="{StaticResource SideNavBtn}"
+                        Click="SideNav_Uitloggen" Foreground="#FFDDBB"/>
             </StackPanel>
         </Grid>
 
@@ -143,12 +120,11 @@
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-            <!-- Zoekbalk — geen Foreground hier, wordt door code-behind beheerd -->
-            <Border Grid.Row="0" Background="{StaticResource LightGrayBrush}"
-                    CornerRadius="6" Margin="12,16,12,12" Padding="10,8">
+            <!-- Zoekbalk -->
+            <Border Grid.Row="0" Background="#253545" CornerRadius="8" Margin="12,16,12,10" Padding="10,8">
                 <TextBox x:Name="ZoekBox"
                          Background="Transparent" BorderThickness="0"
-                         FontSize="14"
+                         FontSize="14" Foreground="White"
                          GotFocus="ZoekBox_GotFocus"
                          LostFocus="ZoekBox_LostFocus"
                          TextChanged="ZoekBox_TextChanged"/>
@@ -157,95 +133,103 @@
             <!-- Contactenlijst -->
             <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Padding="12,0,12,12">
                 <StackPanel>
-
-                    <StackPanel Orientation="Horizontal" Margin="0,8,0,8">
-                        <Button Content="+"
-                                Background="Transparent" BorderThickness="0"
-                                Foreground="{StaticResource WhiteBrush}"
-                                FontSize="20" FontWeight="Bold"
-                                Cursor="Hand" Padding="0,0,6,0"
-                                Click="OnNieuwBerichtClick"/>
-                        <TextBlock Text="Berichten"
-                                   Foreground="{StaticResource WhiteBrush}"
-                                   FontSize="18" FontWeight="Bold"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
+                    <!-- Berichten header (geen + knop meer) -->
+                    <TextBlock Text="Berichten"
+                               Foreground="{StaticResource WhiteBrush}"
+                               FontSize="18" FontWeight="Bold"
+                               Margin="4,8,0,10"/>
 
                     <ItemsControl x:Name="BerichtenContactenPanel">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource ContactButtonStyle}"
-                                        Tag="{Binding}"
-                                        Click="OnContactClick">
-                                    <Grid>
-                                        <Grid.ColumnDefinitions>
-                                            <ColumnDefinition Width="Auto"/>
-                                            <ColumnDefinition Width="*"/>
-                                        </Grid.ColumnDefinitions>
-
-                                        <Grid Grid.Column="0" Margin="0,0,10,0">
-                                            <Ellipse Style="{StaticResource SmallAvatarStyle}"/>
-                                            <Ellipse Width="10" Height="10"
-                                                     Fill="{StaticResource OnlineGreen}"
-                                                     HorizontalAlignment="Right"
-                                                     VerticalAlignment="Bottom"/>
+                                <Border Background="{Binding AchtergrondKleur}" CornerRadius="8" Margin="0,2,0,2">
+                                    <Button Style="{StaticResource ContactButtonStyle}" Tag="{Binding}" Click="OnContactClick">
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="Auto"/>
+                                                <ColumnDefinition Width="*"/>
+                                                <ColumnDefinition Width="Auto"/>
+                                            </Grid.ColumnDefinitions>
+                                            <!-- Avatar met foto -->
+                                            <Grid Grid.Column="0" Width="40" Height="40" Margin="0,0,10,0">
+                                                <Ellipse Width="40" Height="40" Fill="#3A5068"/>
+                                                <Image Width="40" Height="40"
+                                                       Stretch="UniformToFill" Source="{Binding FotoBron}">
+                                                    <Image.Clip><EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20"/></Image.Clip>
+                                                </Image>
+                                                <TextBlock Text="{Binding Initiaal}" Foreground="White" FontSize="15"
+                                                           FontWeight="Bold" HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           Visibility="{Binding InitiaalVisible}"/>
+                                            </Grid>
+                                            <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Naam}" FontSize="14"
+                                                           Foreground="White" FontWeight="SemiBold"/>
+                                                <TextBlock Text="{Binding LaatsteBerichtPreview}" FontSize="12"
+                                                           Foreground="#8899AA" TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+                                            <!-- Actief bolletje (wit) -->
+                                            <Ellipse Grid.Column="2" Width="10" Height="10"
+                                                     Margin="8,0,4,0" VerticalAlignment="Center">
+                                                <Ellipse.Style>
+                                                    <Style TargetType="Ellipse">
+                                                        <Setter Property="Fill" Value="Transparent"/>
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding IsActief}" Value="True">
+                                                                <Setter Property="Fill" Value="White"/>
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </Ellipse.Style>
+                                            </Ellipse>
                                         </Grid>
-
-                                        <Border Grid.Column="1"
-                                                Background="{StaticResource LightGrayBrush}"
-                                                CornerRadius="6" Padding="10,8"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Naam}"
-                                                       FontSize="14" Foreground="#333333"/>
-                                        </Border>
-                                    </Grid>
-                                </Button>
+                                    </Button>
+                                </Border>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
 
-                    <StackPanel Orientation="Horizontal" Margin="0,16,0,8">
-                        <Button Content="+"
-                                Background="Transparent" BorderThickness="0"
-                                Foreground="{StaticResource WhiteBrush}"
-                                FontSize="20" FontWeight="Bold"
-                                Cursor="Hand" Padding="0,0,6,0"
-                                Click="OnNieuweGroepClick"/>
-                        <TextBlock Text="Groepen"
-                                   Foreground="{StaticResource WhiteBrush}"
-                                   FontSize="18" FontWeight="Bold"
-                                   VerticalAlignment="Center"/>
+                    <!-- Groepen header (behoudt + knop voor nieuwe groep) -->
+                    <StackPanel Orientation="Horizontal" Margin="4,20,0,10">
+                        <TextBlock Text="Groepen" Foreground="{StaticResource WhiteBrush}"
+                                   FontSize="18" FontWeight="Bold" VerticalAlignment="Center"/>
+                        <Button Content="+" Background="Transparent" BorderThickness="0"
+                                Foreground="{StaticResource WhiteBrush}" FontSize="22" FontWeight="Bold"
+                                Cursor="Hand" Padding="8,0,0,0" Click="OnNieuweGroepClick"
+                                ToolTip="Nieuwe groep aanmaken"/>
                     </StackPanel>
 
                     <ItemsControl x:Name="GroepenPanel">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <Button Style="{StaticResource ContactButtonStyle}"
-                                        Tag="{Binding}"
-                                        Click="OnGroepClick">
+                                <Button Style="{StaticResource ContactButtonStyle}" Tag="{Binding}" Click="OnGroepClick">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition Width="Auto"/>
                                             <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
                                         </Grid.ColumnDefinitions>
-
-                                        <Grid Grid.Column="0" Margin="0,0,10,0">
-                                            <Ellipse Style="{StaticResource SmallAvatarStyle}"/>
+                                        <Grid Grid.Column="0" Width="40" Height="40" Margin="0,0,10,0">
+                                            <Ellipse Width="40" Height="40" Fill="#3A5068"/>
+                                            <TextBlock Text="👥" FontSize="18"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                         </Grid>
-
-                                        <Border Grid.Column="1"
-                                                Background="{StaticResource LightGrayBrush}"
-                                                CornerRadius="6" Padding="10,8"
-                                                VerticalAlignment="Center">
-                                            <TextBlock Text="{Binding Naam}"
-                                                       FontSize="14" Foreground="#333333"/>
-                                        </Border>
+                                        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Naam}" FontSize="14"
+                                                       Foreground="White" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding LedenTekst}" FontSize="12" Foreground="#8899AA"/>
+                                        </StackPanel>
+                                        <!-- Instellingen knop voor eigenaar -->
+                                        <Button Grid.Column="2" Content="⚙" Background="Transparent"
+                                                BorderThickness="0" Foreground="#8899AA" FontSize="16"
+                                                Cursor="Hand" Tag="{Binding}"
+                                                Click="OnGroepInstellingenClick"
+                                                Visibility="{Binding InstellingenVisible}"/>
                                     </Grid>
                                 </Button>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
-
                 </StackPanel>
             </ScrollViewer>
         </Grid>
@@ -253,69 +237,66 @@
         <!-- CHAT PANEEL -->
         <Grid Grid.Column="2" Background="{StaticResource NavyBrush}">
             <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
+                <RowDefinition Height="64"/>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
+            <!-- Chat header -->
             <Border Grid.Row="0" Background="{StaticResource CardBrush}" Padding="16,0">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Style="{StaticResource SmallAvatarStyle}" Margin="0,0,12,0"/>
-                    <TextBlock x:Name="ChatNaamText"
-                               Text=""
-                               Foreground="{StaticResource WhiteBrush}"
-                               FontSize="16" FontWeight="SemiBold"
-                               VerticalAlignment="Center"/>
+                    <Grid Width="40" Height="40" Margin="0,0,12,0">
+                        <Ellipse Width="40" Height="40" Fill="#3A5068"/>
+                        <Image x:Name="ChatHeaderAvatar" Width="40" Height="40" Stretch="UniformToFill">
+                            <Image.Clip><EllipseGeometry Center="20,20" RadiusX="20" RadiusY="20"/></Image.Clip>
+                        </Image>
+                        <TextBlock x:Name="ChatHeaderInitiaal" Text="" Foreground="White" FontSize="16"
+                                   FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Grid>
+                    <TextBlock x:Name="ChatNaamText" Text="" Foreground="{StaticResource WhiteBrush}"
+                               FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center"/>
                 </StackPanel>
             </Border>
 
-            <ScrollViewer x:Name="ChatScrollViewer"
-                          Grid.Row="1"
+            <ScrollViewer x:Name="ChatScrollViewer" Grid.Row="1"
                           VerticalScrollBarVisibility="Auto"
                           HorizontalScrollBarVisibility="Disabled"
-                          Padding="16,12">
-                <StackPanel x:Name="ChatPanel"/>
-            </ScrollViewer>
+                          HorizontalContentAlignment="Stretch"
+                          Padding="20,16"/>
 
-            <!-- Invoerbalk — geen Foreground hier, wordt door code-behind beheerd -->
+            <!-- Invoerbalk -->
             <Grid Grid.Row="2" Margin="16,8,16,16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
-
-                <Border Grid.Column="0" Background="{StaticResource LightGrayBrush}"
-                        CornerRadius="6" Padding="12,8" Margin="0,0,10,0">
-                    <TextBox x:Name="BerichtInput"
-                             Background="Transparent" BorderThickness="0"
-                             FontSize="14"
-                             VerticalContentAlignment="Center"
-                             GotFocus="BerichtInput_GotFocus"
-                             LostFocus="BerichtInput_LostFocus"
-                             KeyDown="BerichtInput_KeyDown"/>
+                <Border Grid.Column="0" Background="#253545" CornerRadius="8" Padding="14,10" Margin="0,0,10,0">
+                    <Grid>
+                        <TextBox x:Name="BerichtInput" Background="Transparent" BorderThickness="0"
+                                 FontSize="15" Foreground="White"
+                                 TextWrapping="Wrap"
+                                 AcceptsReturn="False"
+                                 VerticalScrollBarVisibility="Disabled"
+                                 MaxHeight="120"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="BerichtInput_KeyDown"
+                                 TextChanged="BerichtInput_TextChanged"/>
+                        <TextBlock x:Name="BerichtPlaceholder"
+                                   Text="Schrijf een bericht..."
+                                   Foreground="#667788" FontSize="15"
+                                   VerticalAlignment="Center"
+                                   IsHitTestVisible="False"/>
+                    </Grid>
                 </Border>
-
-                <Button Grid.Column="1"
-                        Content="Stuur"
-                        Background="{StaticResource OrangeBrush}"
-                        Foreground="{StaticResource WhiteBrush}"
-                        FontSize="14" FontWeight="SemiBold"
-                        BorderThickness="0"
-                        Padding="20,10"
-                        Cursor="Hand"
-                        Click="OnStuurClick">
+                <Button Grid.Column="1" Content="Stuur →" Background="{StaticResource OrangeBrush}"
+                        Foreground="{StaticResource WhiteBrush}" FontSize="14" FontWeight="SemiBold"
+                        BorderThickness="0" Padding="20,12" Cursor="Hand" Click="OnStuurClick">
                     <Button.Template>
                         <ControlTemplate TargetType="Button">
-                            <Border Background="{TemplateBinding Background}"
-                                    CornerRadius="6"
+                            <Border Background="{TemplateBinding Background}" CornerRadius="8"
                                     Padding="{TemplateBinding Padding}">
                                 <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="#CC5200"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
                         </ControlTemplate>
                     </Button.Template>
                 </Button>

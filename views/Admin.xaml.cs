@@ -35,8 +35,6 @@ namespace MoreConnector.Views
             RefreshLeegStaten();
             SetActiveTab(TabPostsBtn);
         }
-
-        // ── Tab active state ─────────────────────────────────────────────────
         private void SetActiveTab(Button actief)
         {
             var normaal = (Style)Resources["TabButtonStyle"];
@@ -83,8 +81,6 @@ namespace MoreConnector.Views
             UsersPanel.Visibility = Visibility.Visible;
             SetActiveTab(TabUsersBtn);
         }
-
-        // ── Herlaad ──────────────────────────────────────────────────────────
         private void HerlaadPosts()
         {
             string zoek = PostsSearchBox?.Text?.ToLower() ?? "";
@@ -111,19 +107,28 @@ namespace MoreConnector.Views
         {
             string zoek = UsersSearchBox?.Text?.ToLower() ?? "";
             _gefilterdeGebruikers.Clear();
-            foreach (var u in _state.Gebruikers.Where(u =>
-                (u.VolledigeNaam ?? "").ToLower().Contains(zoek) ||
-                (u.Username ?? "").ToLower().Contains(zoek)))
-                _gefilterdeGebruikers.Add(u);
+            // Admin laadt ALLE gebruikers inclusief gebande rechtstreeks uit DB
+            try
+            {
+                var alleUsers = UserRepository.GetAllInclusingBanned();
+                foreach (var u in alleUsers.Where(u =>
+                    (u.VolledigeNaam ?? "").ToLower().Contains(zoek) ||
+                    (u.Username ?? "").ToLower().Contains(zoek)))
+                    _gefilterdeGebruikers.Add(u);
+            }
+            catch
+            {
+                // Fallback op AppState als DB niet bereikbaar
+                foreach (var u in _state.Gebruikers.Where(u =>
+                    (u.VolledigeNaam ?? "").ToLower().Contains(zoek) ||
+                    (u.Username ?? "").ToLower().Contains(zoek)))
+                    _gefilterdeGebruikers.Add(u);
+            }
             RefreshLeegStaten();
         }
-
-        // ── Zoeken ───────────────────────────────────────────────────────────
         private void PostsSearchBox_TextChanged(object sender, TextChangedEventArgs e)  => HerlaadPosts();
         private void EventsSearchBox_TextChanged(object sender, TextChangedEventArgs e) => HerlaadEvents();
         private void UsersSearchBox_TextChanged(object sender, TextChangedEventArgs e)  => HerlaadGebruikers();
-
-        // ── Verwijderen — ook echt uit DB ────────────────────────────────────
         private void OnPostVerwijderenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not AdminPost post) return;
@@ -159,22 +164,132 @@ namespace MoreConnector.Views
 
             try { UserRepository.Verwijder(user.Id); } catch { }
             _state.Gebruikers.Remove(user);
+            // Als verwijderde user = ingelogde user: navigeer naar login
+            if (_state.HuidigeGebruiker == null)
+            {
+                ((MoreConnector)Window.GetWindow(this)).NavigateToLogin();
+                return;
+            }
         }
-
-        // ── Ban / Unban ──────────────────────────────────────────────────────
-        private void OnGebruikerVerbannenClick(object sender, RoutedEventArgs e)
+        private void OnBanToggleClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not User user) return;
-            user.IsBanned = true;
+
+            if (user.IsActive) // momenteel actief → bannen
+            {
+                var res = MessageBox.Show(
+                    $"'{user.VolledigeNaam}' blokkeren?\n\nDeze gebruiker kan niet meer inloggen en hun content wordt verborgen.",
+                    "Verban gebruiker", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+                if (res != MessageBoxResult.Yes) return;
+
+                try { UserRepository.BanGebruiker(user.Id); } catch { }
+                user.IsActive = false;
+                user.IsBanned = true;
+
+                // Verwijder content uit AppState
+                var posts = _state.FeedPosts.Where(p => p.UserId == user.Id).ToList();
+                foreach (var p in posts) _state.FeedPosts.Remove(p);
+                var berichten = _state.Berichten.Where(b => b.Auteur == user.VolledigeNaam || b.Auteur == user.DisplayNaam).ToList();
+                foreach (var b in berichten) _state.Berichten.Remove(b);
+                var events = _state.Evenementen.Where(ev => ev.CreatorId == user.Id).ToList();
+                foreach (var ev in events) _state.Evenementen.Remove(ev);
+
+                MessageBox.Show($"{user.VolledigeNaam} is geblokkeerd.", "Geblokkeerd", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+            else // momenteel gebanned → deblokkeren
+            {
+                var res = MessageBox.Show(
+                    $"'{user.VolledigeNaam}' deblokkeren?\n\nDeze gebruiker kan opnieuw inloggen.",
+                    "Deblokkeer gebruiker", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                if (res != MessageBoxResult.Yes) return;
+
+                try { UserRepository.UnbanGebruiker(user.Id); } catch { }
+                user.IsActive = true;
+                user.IsBanned = false;
+
+                MessageBox.Show($"{user.VolledigeNaam} is gedeblokkeerd.", "Gedeblokkeerd", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+
+            HerlaadGebruikers();
         }
 
-        private void OnGebruikerDeblokkeerenClick(object sender, RoutedEventArgs e)
+        private void OnEmailWijzigenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not User user) return;
-            user.IsBanned = false;
-        }
 
-        // ── Wachtwoord wijzigen — grotere opslaan knop ───────────────────────
+            var win = new Window
+            {
+                Title = $"E-mail wijzigen — {user.VolledigeNaam}",
+                Width = 460, Height = 260,
+                WindowStartupLocation = WindowStartupLocation.CenterOwner,
+                Owner = Window.GetWindow(this), ResizeMode = ResizeMode.NoResize,
+                Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(27, 42, 59))
+            };
+
+            var sp = new StackPanel { Margin = new Thickness(28) };
+            sp.Children.Add(new TextBlock
+            {
+                Text = $"Huidig e-mailadres: {user.Email}",
+                Foreground = System.Windows.Media.Brushes.Gray, FontSize = 12,
+                Margin = new Thickness(0, 0, 0, 12)
+            });
+
+            var emailBox = new TextBox
+            {
+                Text = user.Email,
+                Padding = new Thickness(10, 10, 10, 10), FontSize = 14,
+                Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(20, 35, 50)),
+                Foreground = System.Windows.Media.Brushes.White,
+                BorderThickness = new Thickness(0),
+                Margin = new Thickness(0, 0, 0, 12)
+            };
+            sp.Children.Add(new TextBlock { Text = "Nieuw e-mailadres", Foreground = System.Windows.Media.Brushes.Gray, FontSize = 12, Margin = new Thickness(0,0,0,4) });
+            sp.Children.Add(emailBox);
+
+            var fout = new TextBlock { Foreground = System.Windows.Media.Brushes.Tomato, FontSize = 12, Visibility = Visibility.Collapsed, Margin = new Thickness(0, 0, 0, 8) };
+            sp.Children.Add(fout);
+
+            var opslaanBtn = new Button
+            {
+                Content = "✉  E-mail opslaan",
+                Padding = new Thickness(20, 12, 20, 12),
+                Background = new System.Windows.Media.SolidColorBrush(
+                    System.Windows.Media.Color.FromRgb(51, 102, 153)),
+                Foreground = System.Windows.Media.Brushes.White,
+                BorderThickness = new Thickness(0),
+                Cursor = System.Windows.Input.Cursors.Hand,
+                FontSize = 14, FontWeight = FontWeights.SemiBold,
+                HorizontalAlignment = HorizontalAlignment.Stretch, Height = 48
+            };
+            opslaanBtn.Click += (_, _) =>
+            {
+                string nieuw = emailBox.Text.Trim();
+                if (!IsGeldigEmail(nieuw))
+                {
+                    fout.Text = "Vul een geldig e-mailadres in.";
+                    fout.Visibility = Visibility.Visible;
+                    return;
+                }
+                try
+                {
+                    UserRepository.UpdateProfiel(user.Id, user.Firstname, user.Lastname,
+                        nieuw, user.Study, user.Bio, user.Username, user.ProfielFotoPad);
+                    user.Email = nieuw;
+                    MessageBox.Show("E-mailadres opgeslagen.", "Opgeslagen");
+                    win.Close();
+                }
+                catch (System.Exception ex)
+                {
+                    fout.Text = $"Fout: {ex.Message}";
+                    fout.Visibility = Visibility.Visible;
+                }
+            };
+            sp.Children.Add(opslaanBtn);
+            win.Content = sp;
+            win.ShowDialog();
+        }
         private void OnWachtwoordWijzigenClick(object sender, RoutedEventArgs e)
         {
             if (sender is not Button btn || btn.Tag is not User user) return;
@@ -182,7 +297,7 @@ namespace MoreConnector.Views
             var win = new Window
             {
                 Title = $"Wachtwoord — {user.DisplayNaam}",
-                Width = 420, Height = 280,
+                Width = 520, Height = 420,
                 WindowStartupLocation = WindowStartupLocation.CenterOwner,
                 Owner = Window.GetWindow(this),
                 ResizeMode = ResizeMode.NoResize,
@@ -236,8 +351,12 @@ namespace MoreConnector.Views
             win.Content = sp;
             win.ShowDialog();
         }
+        private static bool IsGeldigEmail(string email)
+        {
+            try { _ = new System.Net.Mail.MailAddress(email); return true; }
+            catch { return false; }
+        }
 
-        // ── Navigatie ─────────────────────────────────────────────────────────
         private void OnNaarAppClick(object sender, RoutedEventArgs e)
             => ((MoreConnector)Window.GetWindow(this)).AuthFrame.Navigate(new Feed());
 
@@ -251,8 +370,6 @@ namespace MoreConnector.Views
                 ((MoreConnector)Window.GetWindow(this)).NavigateToLogin();
             }
         }
-
-        // ── Comments ──────────────────────────────────────────────────────────
         private void HerlaadComments()
         {
             string zoek = CommentsSearchBox?.Text?.ToLower() ?? "";
@@ -312,5 +429,6 @@ namespace MoreConnector.Views
         public string AuthorName     { get; set; } = "";
         public string Content        { get; set; } = "";
         public string CreatedAtTekst { get; set; } = "";
+
     }
 }

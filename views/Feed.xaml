@@ -203,11 +203,6 @@
                     </ItemsControl>
 
                     <!-- SECTIE 2: Sociale feed -->
-                    <TextBlock Text="Feed"
-                               Foreground="{StaticResource WhiteBrush}"
-                               FontSize="16" FontWeight="Bold"
-                               Margin="0,24,0,12"/>
-
                     <StackPanel x:Name="FeedPanel"/>
 
                 </StackPanel>

@@ -7,7 +7,7 @@ namespace MoreConnector.Views
 {
     public partial class AanmakenKeuze : Page
     {
-        public AanmakenKeuze() { InitializeComponent(); }
+        public AanmakenKeuze() { InitializeComponent(); SidebarHelper.Init(this, SidebarHelper.ActivePage.Aanmaken); }
 
         private void OnPostKeuze(object sender, MouseButtonEventArgs e)
             => Nav().AuthFrame.Navigate(new PostMaker());
@@ -20,9 +20,6 @@ namespace MoreConnector.Views
         private void OnBerichtenClick(object sender, RoutedEventArgs e)    => Nav().AuthFrame.Navigate(new MessagePage());
         private void OnAanmakenClick(object sender, RoutedEventArgs e)     => Nav().AuthFrame.Navigate(new AanmakenKeuze());
         private void OnProfielClick(object sender, RoutedEventArgs e)      => Nav().AuthFrame.Navigate(new ProfilePage());
-
-
-        // ── Sidebar nav handlers ─────────────────────────────────────────────
 
         private void SideNav_Gebruikers(object sender, RoutedEventArgs e)   => Nav().AuthFrame.Navigate(new GebruikersPage());
         private void SideNav_Notificaties(object sender, RoutedEventArgs e) => Nav().AuthFrame.Navigate(new NotificatiePage());
