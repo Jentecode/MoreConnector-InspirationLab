@@ -13,7 +13,7 @@ namespace MoreConnector.Models
         public DateTime EventDate       { get; set; }
         public int      MaxParticipants { get; set; }
         public DateTime CreatedAt       { get; set; }
-        public string   ImagePath       { get; set; } = "";  // FIX: afbeelding pad
+        public string   ImagePath       { get; set; } = "";
 
         public string       CreatorName       { get; set; } = "";
         public int          ParticipantCount  { get; set; }

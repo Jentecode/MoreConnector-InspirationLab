@@ -22,7 +22,7 @@ namespace MoreConnector.Models
     public class AdminEvenement : INotifyPropertyChanged
     {
         public int Id         { get; set; }
-        public int CreatorId  { get; set; }  // FIX: voor naamswijziging-detectie
+        public int CreatorId  { get; set; }
         private string _naam = "";
         public string Naam { get => _naam; set { _naam = value; OnChanged(nameof(Naam)); } }
         private string _locatie = "";

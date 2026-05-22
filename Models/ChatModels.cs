@@ -9,6 +9,7 @@ namespace MoreConnector.Models
         public string Naam         { get; set; } = "";
         public string Beschrijving { get; set; } = "";
         public int    CreatorId    { get; set; }
+        public int    EigenaarId   => CreatorId;  // alias voor GroepVM
         public int    AantalLeden  { get; set; }
     }
 
@@ -18,8 +19,9 @@ namespace MoreConnector.Models
         public int      SenderId   { get; set; }
         public string   Tekst      { get; set; } = "";
         public DateTime SentAt     { get; set; }
-        public string   SenderNaam { get; set; } = "";
-        public bool     IsEigen    { get; set; }
+        public string   SenderNaam  { get; set; } = "";
+        public string   SenderPhoto { get; set; } = "";
+        public bool     IsEigen     { get; set; }
     }
 
     public class DmContact

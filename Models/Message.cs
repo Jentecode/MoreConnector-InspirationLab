@@ -15,5 +15,6 @@ namespace MoreConnector.Models
         public string SenderName   { get; set; } = "";
         public string ReceiverName { get; set; } = "";
         public bool   IsOwn        { get; set; }   // true als sender == ingelogde gebruiker
+        public string SenderPhoto  { get; set; } = "";  // profiel foto pad van de verzender
     }
 }
