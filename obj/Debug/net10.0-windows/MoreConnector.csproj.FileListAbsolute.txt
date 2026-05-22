@@ -1,0 +1,124 @@
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MoreConnector.exe
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MoreConnector.deps.json
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MoreConnector.runtimeconfig.json
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MoreConnector.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MoreConnector.pdb
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\bin\Debug\net10.0-windows\MySqlConnector.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.csproj.AssemblyReference.cache
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AanmakenKeuze.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AccountCreation.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ActivityMaker.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ActivityPage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Admin.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AndereProfielPage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\BewerkActiviteitPage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\EmailVerification.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\EvenementDetail.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Feed.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\GebruikersPage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\login.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\MessagePage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\MoreConnector.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\NotificatiePage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\PasswordReset.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\PostMaker.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ProfileEdit.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ProfilePage.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Sidebar.baml
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AanmakenKeuze.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AccountCreation.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ActivityMaker.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ActivityPage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Admin.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\AndereProfielPage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\BewerkActiviteitPage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\EmailVerification.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\EvenementDetail.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Feed.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\GebruikersPage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\login.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\MessagePage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\MoreConnector.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\NotificatiePage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\PasswordReset.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\PostMaker.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ProfileEdit.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\ProfilePage.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\Views\Sidebar.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector_MarkupCompile.cache
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.g.resources
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.AssemblyInfoInputs.cache
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.AssemblyInfo.cs
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.csproj.CoreCompileInputs.cache
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConn.40A5EF99.Up2Date
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\refint\MoreConnector.dll
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.pdb
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\MoreConnector.genruntimeconfig.cache
+C:\Users\peete\Downloads\COOOOONTINUE_clean (1)\COOOOONTINUE WITH THIS\Jente More\MC_final\obj\Debug\net10.0-windows\ref\MoreConnector.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MoreConnector.exe
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MoreConnector.deps.json
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MoreConnector.runtimeconfig.json
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MoreConnector.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MoreConnector.pdb
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\Microsoft.Extensions.DependencyInjection.Abstractions.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\Microsoft.Extensions.Logging.Abstractions.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\bin\Debug\net10.0-windows\MySqlConnector.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.csproj.AssemblyReference.cache
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AanmakenKeuze.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AccountCreation.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ActivityMaker.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ActivityPage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Admin.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AndereProfielPage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\BewerkActiviteitPage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\EmailVerification.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\EvenementDetail.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Feed.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\GebruikersPage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\login.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\MessagePage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\MoreConnector.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\NotificatiePage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\PasswordReset.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\PostMaker.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ProfileEdit.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ProfilePage.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Sidebar.baml
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AanmakenKeuze.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AccountCreation.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ActivityMaker.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ActivityPage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Admin.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\AndereProfielPage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\BewerkActiviteitPage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\EmailVerification.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\EvenementDetail.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Feed.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\GebruikersPage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\login.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\MessagePage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\MoreConnector.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\NotificatiePage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\PasswordReset.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\PostMaker.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ProfileEdit.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\ProfilePage.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\Views\Sidebar.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\App.g.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector_MarkupCompile.cache
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.g.resources
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.AssemblyInfoInputs.cache
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.AssemblyInfo.cs
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.csproj.CoreCompileInputs.cache
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConn.40A5EF99.Up2Date
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\refint\MoreConnector.dll
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.pdb
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\MoreConnector.genruntimeconfig.cache
+C:\Users\peete\Downloads\FINAL_VERSION_MoreConnector\Bestanden\obj\Debug\net10.0-windows\ref\MoreConnector.dll
